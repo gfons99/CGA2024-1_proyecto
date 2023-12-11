@@ -183,6 +183,205 @@ float rotHelHelBack = 0.0;
 int stateDoor = 0;
 float dorRotCount = 0.0;
 
+//--------------------------------------------------------------------------------------------
+//bool Casilla_conbate=false ,Casilla_buffo = false, Casilla_jefe=false;
+int buffo = 0;
+int combate = 0;
+int diceValue = 1; // Valor del dado
+//--------------------------------------------------------------------------------------------
+/*struct Dado{
+	int valor;
+};
+struct Dado InicializarDado(){
+	struct Dado dado;
+	dado.valor==1+rand()%5;
+}*/
+
+//-----------------------------------------------------------------
+// Definición de una estructura para un personaje
+struct Personaje {
+    int ataque;
+    int defensa;
+    int vida;
+    int movimiento;
+	int PossTablero;
+};
+
+// Función para inicializar un personaje basado en el tipo
+struct Personaje inicializarPersonaje(int tipo_personaje) {
+    struct Personaje personaje;
+
+    switch (tipo_personaje) {
+        case 1:
+            personaje.ataque = 5;
+            personaje.defensa = 2;
+            personaje.vida = 6;
+            personaje.movimiento = 5;
+			personaje.PossTablero = 0;
+            break;
+        case 2:
+            personaje.ataque = 2;
+            personaje.defensa = 3;
+            personaje.vida = 10;
+            personaje.movimiento = 6;
+			personaje.PossTablero = 0;
+            break;
+        case 3:
+            personaje.ataque = 3;
+            personaje.defensa = 5;
+            personaje.vida = 8;
+            personaje.movimiento = 3;
+			personaje.PossTablero = 0;
+            break;
+        case 4:
+            personaje.ataque = 4;
+            personaje.defensa = 1;
+            personaje.vida = 10;
+            personaje.movimiento = 4;
+			personaje.PossTablero = 0;
+            break;
+        default:
+            // En caso de un tipo de personaje no reconocido, se inicializan todos los valores a 0
+            personaje.ataque = 0;
+            personaje.defensa = 0;
+            personaje.vida = 0;
+            personaje.movimiento = 0;
+			personaje.PossTablero = 0;
+            break;
+    }
+
+    return personaje;
+}
+
+
+// Definición de una estructura para los monstruos
+struct Monstruo {
+    int ataque;
+    int defensa;
+    int vida;
+};
+
+// Función para inicializar un monstruo basado en el tipo
+struct Monstruo inicializarMonstruo(int tipo_monstruo) {
+    struct Monstruo monstruo;
+
+    switch (tipo_monstruo) {
+        case 0:
+            monstruo.ataque = 2;
+            monstruo.defensa = 3;
+            monstruo.vida = 3;
+            break;
+        case 1:
+            monstruo.ataque = 4;
+            monstruo.defensa = 2;
+            monstruo.vida = 5;
+            break;
+        case 2:
+            monstruo.ataque = 3;
+            monstruo.defensa = 1;
+            monstruo.vida = 8;
+            break;
+        case 3:
+            monstruo.ataque = 8;
+            monstruo.defensa = 5;
+            monstruo.vida = 50;
+            break;
+        default:
+            // En caso de un tipo de monstruo no reconocido, se inicializan todos los valores a 0
+            monstruo.ataque = 0;
+            monstruo.defensa = 0;
+            monstruo.vida = 0;
+            break;
+    }
+
+    return monstruo;
+}
+//------------------------------------------------------------------
+
+
+struct Personaje Cazador = inicializarPersonaje(0);
+struct Personaje Sanador = inicializarPersonaje(1);
+struct Personaje Caballero = inicializarPersonaje(2);
+struct Personaje Vengador = inicializarPersonaje(3);
+
+struct Monstruo Esqueleto = inicializarMonstruo(0);
+struct Monstruo Demonio = inicializarMonstruo(1);
+struct Monstruo Hechicero = inicializarMonstruo(2);
+struct Monstruo Anfiteres = inicializarMonstruo(3);
+
+//--------------------------------------------------------------------
+Personaje Combate(Personaje Pj, Monstruo Ms){
+
+	// dados
+	int dadoPj=1+rand()%5;
+	int dadoMs=1+rand()%5;
+    // Cálculo del daño al monstruo y al personaje
+	
+    int damage_monstruo = (Pj.ataque + dadoPj) - Ms.vida + Ms.defensa; //daño que sufre MS
+
+	if(damage_monstruo < 0 ){
+		damage_monstruo = 0;
+	}
+    int damage_personaje =(Ms.ataque + dadoMs) - Pj.vida + Pj.defensa ; //daño que sufre PJ
+	if (damage_personaje < 0)
+	{
+		damage_personaje =0;
+	}
+	
+	//daños 
+    Ms.vida -= damage_monstruo;
+    Pj.vida -= damage_personaje;
+
+    // Aquí podrías imprimir información sobre el combate
+    printf("El monstruo infligió %d de daño al personaje.\n", damage_personaje);
+    printf("El personaje infligió %d de daño al monstruo.\n", damage_monstruo);
+
+
+    return Pj; // Podrías devolver algún valor indicando el resultado del combate
+}
+
+
+int Tablero(Personaje Pj, int Mov, int dado) {
+    Pj.PossTablero= Mov + dado; 
+
+    int Tipo_Casilla = rand() % 2; // Considera incluir el valor 2 (rand() % 3) en lugar de 2 (rand() % 2) para cubrir todos los casos.
+
+    //Monstruo Ms = inicializarMonstruo(1+rand() % 2); // Asegúrate de definir 'Ms' como un Monstruo.
+	int Tipo_MS=rand() % 2;
+
+	Monstruo Ms=inicializarMonstruo(Tipo_MS);
+
+	//Monstruo MS =Esqueleto;
+	Monstruo Jefe =inicializarMonstruo(4);
+	buffo= rand() % 3;
+    switch (Tipo_Casilla) {
+        case 0:
+            if (buffo == 1) {
+                Pj.ataque = Pj.ataque + 2;
+            }
+            if (buffo == 2) {
+                Pj.defensa = Pj.defensa + 2;
+            }
+            if (buffo == 3) {
+                Pj.movimiento = Pj.movimiento + 2;
+            }
+            break;
+
+        case 1:
+            Combate(Pj, Ms); // Llama a la función de combate con el personaje y el monstruo.
+            break;
+
+        case 2:
+            Combate(Pj, Jefe); // Llama a la función de combate con el personaje y el monstruo.
+            break;
+
+        default:
+            break;
+    }
+    return 0; // Añade un valor de retorno para la función.
+}
+
+
 // Lamps position
 std::vector<glm::vec3> lamp1Position = {
 	glm::vec3(-7.03, 0, -19.14),
