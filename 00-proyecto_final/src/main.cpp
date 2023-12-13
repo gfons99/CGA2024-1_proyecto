@@ -63,6 +63,15 @@ int screenHeight;
 float cursor_x = -0.5460;
 float cursor_y = 0.8330;
 
+char CadenaVidaCazador[3]; 
+
+char CadenaVidaSanador[3]; 
+
+char CadenaVidaCaballero[3]; 
+
+char CadenaVidaVengador[3]; 
+
+
 const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
 
 GLFWwindow *window;
@@ -203,6 +212,7 @@ bool SanadorSelected = true;
 bool CaballeroSelected = true;
 bool VengadorSelected = true;
 
+int possActual=0;
 // ****************************************************************
 // KEYFRAMES
 // ****************************************************************
@@ -1420,18 +1430,21 @@ bool processInput(bool continueApplication)
 		CaballeroSelected=true;
 		VengadorSelected=true;
 		modelSelected++;
-		if (modelSelected > 4)
-			modelSelected = 0;
+
+		if (modelSelected > 4);
+
+			modelSelected = 1;
 
 		std::cout << "modelSelected:" << modelSelected << std::endl;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_RELEASE){
+		enableCountSelected = true;
 	}
 	//--------------------------------------------------------
 	if(modelSelected == 1)
 	{
 		//tirada de salvacion antes de realizar su acciones
 		if(CazadorSelected && Cazador.vida>0){
-
-		
 
 		if(CazadorSelected && glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS){//tira el dado y avanza 	
 			CazadorSelected=false;
@@ -1442,6 +1455,9 @@ bool processInput(bool continueApplication)
 			GeneradorMs=MostruosGenerdor(GeneradorMs);
 
 			Tablero(&Cazador,dado,&GeneradorMs,&Anfiteres);
+			
+			ModelMatrixCazador = glm::translate(ModelMatrixCazador,glm::vec3(10.0 + Cazador.PossTablero, 0.0 , -50.0));
+		
 
 			printf("Entro a accion 1 del cazador y su ataque es %d\n", Cazador.ataque);
 			printf("Entro a accion 1 del cazador y su defensa es %d\n", Cazador.defensa);
@@ -1466,15 +1482,13 @@ bool processInput(bool continueApplication)
 			printf("Entro a accion 2 del cazador y su vida es %d\n", Cazador.vida);
 			printf("Entro a accion 2 del cazador y su poss es %d\n", Cazador.PossTablero);
 			printf("Entro a accion Ms vida %d\n", GeneradorMs.vida);
+
+			ModelMatrixCazador = glm::translate(ModelMatrixCazador,glm::vec3(10.0 + Cazador.PossTablero, 0.0 , -50.0));
+		}	  
+		}if(CazadorSelected && Cazador.vida<=0){
+			Cazador=TiradaDeSalvacion(Cazador);
+			printf("Cazador Muerto y Su tirada de Salvacion fallo");
 		}
-		/*if(!CazadorSelected && glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS){
-			CazadorSelected=true;
-			modelSelected = 2;
-			}*/		  
-	}if(CazadorSelected && Cazador.vida<=0){
-		Cazador=TiradaDeSalvacion(Cazador);
-		printf("Cazador Muerto y Su tirada de Salvacion fallo");
-	}
 	}
 
 	if(modelSelected == 2)
@@ -1591,21 +1605,16 @@ bool processInput(bool continueApplication)
 		Vengador=TiradaDeSalvacion(Vengador);
 		printf("Vengador Muerto y Su tirada de Salvacion fallo");
 	}	
-		
-	
 	}
 	//--------------------------------------------------------
 	
-	else if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_RELEASE)
-		enableCountSelected = true;
-
-	bool keySpaceStatus = glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS;
+	/*bool keySpaceStatus = glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS;
 	if (!isJump && keySpaceStatus)
 	{
 		isJump = true;
 		startTimeJump = currTime;
 		tmv = 0;
-	}
+	}*/
 
 	glfwPollEvents();
 	return continueApplication;
@@ -1755,13 +1764,16 @@ void renderAlphaScene(bool render = true)
 
 		// std::cout << "cursor_x: " << cursor_x << std::endl;
 		// std::cout << "cursor_y: " << cursor_y << std::endl;
-		modelText->render("001/100", -0.5460, 0.8330);
 
-		modelText->render("002/100", -0.0540, 0.8330);
 
-		modelText->render("003/100", 0.4229, 0.8330);
-
-		modelText->render("004/100", 0.8939, 0.8330);
+		sprintf(CadenaVidaCazador, "%d/6", Cazador.vida);
+		modelText->render(CadenaVidaCazador, -0.5460, 0.8330);
+		sprintf(CadenaVidaSanador, "%d/10", Sanador.vida);
+		modelText->render(CadenaVidaSanador, -0.0540, 0.8330);
+		sprintf(CadenaVidaCaballero, "%d/8", Caballero.vida);
+		modelText->render(CadenaVidaCaballero, 0.4229, 0.8330);
+		sprintf(CadenaVidaVengador, "%d/10", Vengador.vida);
+		modelText->render(CadenaVidaVengador, 0.8939, 0.8330);
 
 		// cursor_x: -0.5460
 		// cursor_y: 0.8330
