@@ -171,6 +171,10 @@ glm::mat4 modelMatrixFountain = glm::mat4(1.0f);
 // ****************************************************************
 int modelSelected = 0;
 bool enableCountSelected = true;
+bool CazadorSelected = true;
+bool SanadorSelected = true;
+bool CaballeroSelected = true;
+bool VengadorSelected = true;
 
 // ****************************************************************
 // KEYFRAMES
@@ -309,94 +313,97 @@ struct Monstruo inicializarMonstruo(int tipo_monstruo)
 
 	return monstruo;
 }
+
+
 //------------------------------------------------------------------
 
-struct Personaje Cazador = inicializarPersonaje(0);
-struct Personaje Sanador = inicializarPersonaje(1);
-struct Personaje Caballero = inicializarPersonaje(2);
-struct Personaje Vengador = inicializarPersonaje(3);
+struct Personaje Cazador = inicializarPersonaje(1);
+struct Personaje Sanador = inicializarPersonaje(2);
+struct Personaje Caballero = inicializarPersonaje(3);
+struct Personaje Vengador = inicializarPersonaje(4);
 
-struct Monstruo Esqueleto = inicializarMonstruo(0);
-struct Monstruo Demonio = inicializarMonstruo(1);
-struct Monstruo Hechicero = inicializarMonstruo(2);
+struct Monstruo GeneradorMs = inicializarMonstruo(0);
 struct Monstruo Anfiteres = inicializarMonstruo(3);
 
 //--------------------------------------------------------------------
-Personaje Combate(Personaje Pj, Monstruo Ms)
-{
 
-	// dados
-	int dadoPj = 1 + rand() % 5;
-	int dadoMs = 1 + rand() % 5;
-	// Cálculo del daño al monstruo y al personaje
+void Combate(Personaje *Pj, Monstruo *Ms) {
+    printf("Entraste al combate.\n");
+    // Dados
+    int dadoPj = 1 + rand() % 6;
+    int dadoMs = 1 + rand() % 6;
 
-	int damage_monstruo = (Pj.ataque + dadoPj) - Ms.vida + Ms.defensa; // daño que sufre MS
+    // Cálculo del daño al monstruo y al personaje
+    printf("El monstruo tiro dado de %d.\n", dadoMs);
+    printf("El personaje tiro dado de %d.\n", dadoPj);
 
-	if (damage_monstruo < 0)
-	{
-		damage_monstruo = 0;
-	}
-	int damage_personaje = (Ms.ataque + dadoMs) - Pj.vida + Pj.defensa; // daño que sufre PJ
-	if (damage_personaje < 0)
-	{
-		damage_personaje = 0;
-	}
+    int damage_monstruo = (Pj->ataque + dadoPj) - Ms->vida + Ms->defensa; // Daño que sufre MS
+    if (damage_monstruo < 0) {
+        damage_monstruo = 0;
+    }
+    int damage_personaje = (Ms->ataque + dadoMs) - Pj->vida + Pj->defensa; // Daño que sufre PJ
+    if (damage_personaje < 0) {
+        damage_personaje = 0;
+    }
 
-	// daños
-	Ms.vida -= damage_monstruo;
-	Pj.vida -= damage_personaje;
+    // Daños
+    Ms->vida -= damage_monstruo;
+    Pj->vida -= damage_personaje;
 
-	// Aquí podrías imprimir información sobre el combate
-	printf("El monstruo infligió %d de daño al personaje.\n", damage_personaje);
-	printf("El personaje infligió %d de daño al monstruo.\n", damage_monstruo);
-
-	return Pj; // Podrías devolver algún valor indicando el resultado del combate
+    // Información sobre el combate
+    printf("El monstruo infligio %d de dano al personaje.\n", damage_personaje);
+    printf("El personaje infligio %d de dano al monstruo.\n", damage_monstruo);
 }
 
-int Tablero(Personaje Pj, int Mov, int dado)
-{
-	Pj.PossTablero = Mov + dado;
 
-	int Tipo_Casilla = rand() % 2; // Considera incluir el valor 2 (rand() % 3) en lugar de 2 (rand() % 2) para cubrir todos los casos.
-
-	// Monstruo Ms = inicializarMonstruo(1+rand() % 2); // Asegúrate de definir 'Ms' como un Monstruo.
-	int Tipo_MS = rand() % 2;
-
-	Monstruo Ms = inicializarMonstruo(Tipo_MS);
-
-	// Monstruo MS =Esqueleto;
-	Monstruo Jefe = inicializarMonstruo(4);
-	buffo = rand() % 3;
-	switch (Tipo_Casilla)
-	{
-	case 0:
-		if (buffo == 1)
-		{
-			Pj.ataque = Pj.ataque + 2;
-		}
-		if (buffo == 2)
-		{
-			Pj.defensa = Pj.defensa + 2;
-		}
-		if (buffo == 3)
-		{
-			Pj.movimiento = Pj.movimiento + 2;
-		}
-		break;
-
-	case 1:
-		Combate(Pj, Ms); // Llama a la función de combate con el personaje y el monstruo.
-		break;
-
-	case 2:
-		Combate(Pj, Jefe); // Llama a la función de combate con el personaje y el monstruo.
-		break;
-
-	default:
-		break;
+Monstruo MostruosGenerdor(Monstruo GeneradorMs){
+	if(GeneradorMs.vida<=0){
+		int Tipo_Ms= rand()%2;
+		GeneradorMs = inicializarMonstruo(Tipo_Ms);
+		printf("se genero un nuevo moutruo \n");
 	}
-	return 0; // Añade un valor de retorno para la función.
+	
+	return GeneradorMs;
 }
+
+void Tablero(Personaje *Pj, int dado, Monstruo Ms, Monstruo *Anfiteres) {
+    printf("Entraste al tablero.\n");
+    Pj->PossTablero = Pj->movimiento + dado;
+
+    int Tipo_Casilla = rand() % 3;
+
+    int buffo = 1 + rand() % 3;
+    switch (Tipo_Casilla) {
+        case 1:
+            if (buffo == 1) {
+                Pj->ataque += 2;
+                printf("Buffo 1\n");
+            }
+            if (buffo == 2) {
+                Pj->defensa += 2;
+                printf("Buffo 2\n");
+            }
+            if (buffo == 3) {
+                Pj->movimiento += 2;
+                printf("Buffo 3\n");
+            }
+            break;
+
+        case 2:
+            Combate(Pj, &Ms);
+            printf("Combate con monstruo.\n");
+            break;
+
+        case 3:
+            Combate(Pj, Anfiteres);
+            printf("Combate con jefe.\n");
+            break;
+
+        default:
+            break;
+    }
+}
+//---------------------------------------------------------------constructores
 
 // Lamps position
 std::vector<glm::vec3> lamp1Position = {
@@ -1342,8 +1349,187 @@ bool processInput(bool continueApplication)
 		modelSelected++;
 		if (modelSelected > 4)
 			modelSelected = 0;
+
 		std::cout << "modelSelected:" << modelSelected << std::endl;
 	}
+	//--------------------------------------------------------
+	if(modelSelected == 1)
+	{
+		//printf("estamos en el cazador\n");
+
+		if(CazadorSelected && glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS){//tira el dado y avanza 	
+			CazadorSelected=false;
+			
+			int dado = 1+rand()%5;
+			printf("Entro a accion 1 del cazador y el dado dio %d\n", dado);
+
+			GeneradorMs=MostruosGenerdor(GeneradorMs);
+
+			Tablero(&Cazador,dado,GeneradorMs,&Anfiteres);
+
+			printf("Entro a accion 1 del cazador y su ataque es %d\n", Cazador.ataque);
+			printf("Entro a accion 1 del cazador y su defensa es %d\n", Cazador.defensa);
+			printf("Entro a accion 1 del cazador y su vida es %d\n", Cazador.vida);
+			printf("Entro a accion 1 del cazador y su poss es %d\n", Cazador.PossTablero);
+
+			printf("Entro a accion Ms vida %d\n", GeneradorMs.vida);
+			
+			
+			//llamar al evento de conbate o buffo o jefe 
+			//modelSelected = modelSelected+1;
+		}if(CazadorSelected && glfwGetKey(window, GLFW_KEY_2)== GLFW_PRESS){//diplica su dañao y avanza 
+			
+			CazadorSelected=false;
+			
+			Cazador.ataque=Cazador.ataque*2;
+			int dado = 1+rand()%5;
+			printf("Entro a accion 2 del cazador y el dado dio %d\n", dado);
+			printf("Entro a accion 2 del cazador y su ataque es %d\n", Cazador.ataque);
+			GeneradorMs=MostruosGenerdor(GeneradorMs);
+			Tablero(&Cazador,dado,GeneradorMs,&Anfiteres);
+			Cazador.ataque=Cazador.ataque/2;
+			printf("Entro a accion 2 del cazador y su ataque es %d\n", Cazador.ataque);
+			printf("Entro a accion 2 del cazador y su defensa es %d\n", Cazador.defensa);
+			printf("Entro a accion 2 del cazador y su vida es %d\n", Cazador.vida);
+			printf("Entro a accion 2 del cazador y su poss es %d\n", Cazador.PossTablero);
+			printf("Entro a accion Ms vida %d\n", GeneradorMs.vida);
+			//modelSelected = modelSelected+1;
+			//llamar al evento de conbate o buffo o jefe 
+		}if(!CazadorSelected && glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS){
+			modelSelected = 2;
+			}		  
+	}
+
+	if(modelSelected == 2)
+	{
+		
+		//printf("estamos en el sanador");
+		if(SanadorSelected && glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS){//tira el dado y avanza 	
+			SanadorSelected = false;
+			int dado = 1+rand()%5;
+			//printf("Entro a accion 1 del cazador y el dado dio %d\n", dado);
+			GeneradorMs=MostruosGenerdor(GeneradorMs);
+			Tablero(&Sanador,dado,GeneradorMs,&Anfiteres);
+			//modelSelected = 3;
+			//llamar al evento de conbate o buffo o jefe 
+			//modelSelected = modelSelected+1;
+
+			printf("Entro a accion 1 del sanador y su ataque es %d\n", Sanador.ataque);
+			printf("Entro a accion 1 del sanador y su defensa es %d\n", Sanador.defensa);
+			printf("Entro a accion 1 del sanador y su vida es %d\n", Sanador.vida);
+			printf("Entro a accion 1 del sanador y su poss es %d\n", Sanador.PossTablero);
+
+			printf("Entro a accion Ms vida %d\n", GeneradorMs.vida);
+			
+		}if(SanadorSelected && glfwGetKey(window, GLFW_KEY_4)== GLFW_PRESS){//diplica su dañao y avanza 
+			SanadorSelected = false;
+			
+			if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS){
+				Cazador.vida=Cazador.vida + 2;
+			}if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS){
+				Caballero.vida=Caballero.vida + 2;
+			}if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS){
+				Vengador.vida=Vengador.vida + 2;
+			}
+			int dado=1+rand()%5;
+			GeneradorMs=MostruosGenerdor(GeneradorMs);
+			Tablero(&Sanador,dado,GeneradorMs,&Anfiteres);
+			//modelSelected = 3;
+			//modelSelected = modelSelected+1;
+			printf("Entro a accion 2 del sanador y su ataque es %d\n", Sanador.ataque);
+			printf("Entro a accion 2 del sanador y su defensa es %d\n", Sanador.defensa);
+			printf("Entro a accion 2 del sanador y su vida es %d\n", Sanador.vida);
+			printf("Entro a accion 2 del sanador y su poss es %d\n", Sanador.PossTablero);
+
+			printf("Entro a accion Ms vida %d\n", GeneradorMs.vida);
+		}
+		if(!SanadorSelected && glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS){
+			modelSelected = 3;
+			}	
+			
+	}
+	if(modelSelected == 3 )
+	{
+		//printf("estamos en el caballero");
+		if(CaballeroSelected && glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS){//tira el dado y avanza 
+			CaballeroSelected=false;
+			int dado=1+rand()%5;
+			GeneradorMs=MostruosGenerdor(GeneradorMs);
+			Tablero(&Caballero,dado,GeneradorMs,&Anfiteres);
+			//modelSelected = 4;
+			//llamar al evento de conbate o buffo o jefe 
+			//modelSelected = modelSelected+1;
+
+			printf("Entro a accion 1 del caballero y su ataque es %d\n", Caballero.ataque);
+			printf("Entro a accion 1 del caballero y su defensa es %d\n", Caballero.defensa);
+			printf("Entro a accion 1 del caballero y su vida es %d\n", Caballero.vida);
+			printf("Entro a accion 1 del caballero y su poss es %d\n", Caballero.PossTablero);
+
+			printf("Entro a accion Ms vida %d\n", GeneradorMs.vida);
+			
+		}if(CaballeroSelected && glfwGetKey(window, GLFW_KEY_6)== GLFW_PRESS){//diplica su dañao y avanza 
+			CaballeroSelected=false;
+			Caballero.defensa = Caballero.defensa+2;
+			int dado=1+rand()%5;
+			MostruosGenerdor(GeneradorMs);
+			Tablero(&Caballero,dado,GeneradorMs,&Anfiteres);
+			Caballero.defensa = Caballero.defensa-2;
+			//modelSelected = 4;
+			//llamar al evento de conbate o buffo o jefe 
+			//modelSelected = modelSelected+1;
+			printf("Entro a accion 2 del caballero y su ataque es %d\n", Caballero.ataque);
+			printf("Entro a accion 2 del caballero y su defensa es %d\n", Caballero.defensa);
+			printf("Entro a accion 2 del caballero y su vida es %d\n", Caballero.vida);
+			printf("Entro a accion 2 del caballero y su poss es %d\n", Caballero.PossTablero);
+
+			printf("Entro a accion Ms vida %d\n", GeneradorMs.vida);
+		}
+		if(!CaballeroSelected && glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS){
+			modelSelected = 4;
+			}	
+		
+	}
+
+	if(modelSelected == 4)
+	{
+		//printf("estamos en el vengador");
+		if(VengadorSelected && glfwGetKey(window, GLFW_KEY_7) == GLFW_PRESS){//tira el dado y avanza 
+			VengadorSelected= false;
+			int dado=1+rand()%5;
+			MostruosGenerdor(GeneradorMs);
+			Tablero(&Vengador,dado,GeneradorMs,&Anfiteres);
+			//modelSelected = 1;
+			//llamar al evento de conbate o buffo o jefe 
+			//modelSelected = modelSelected+1;
+			printf("Entro a accion 1 del vengador y su ataque es %d\n", Vengador.ataque);
+			printf("Entro a accion 1 del vengador y su defensa es %d\n", Vengador.defensa);
+			printf("Entro a accion 1 del vengador y su vida es %d\n", Vengador.vida);
+			printf("Entro a accion 1 del vengador y su poss es %d\n", Vengador.PossTablero);
+
+			printf("Entro a accion Ms vida %d\n", GeneradorMs.vida);
+		}if(VengadorSelected && glfwGetKey(window, GLFW_KEY_8)== GLFW_PRESS){//diplica su dañao y avanza .
+			VengadorSelected= false;
+			Vengador.ataque=Vengador.ataque+(10-Vengador.vida);
+			int dado=1+rand()%5;
+			MostruosGenerdor(GeneradorMs);
+			Tablero(&Vengador,dado,GeneradorMs,&Anfiteres);
+			modelSelected = 1;
+			//llamar al evento de conbate o buffo o jefe 
+			//modelSelected = modelSelected+1;
+			printf("Entro a accion 2 del vengador y su ataque es %d\n", Vengador.ataque);
+			printf("Entro a accion 2 del vengador y su defensa es %d\n", Vengador.defensa);
+			printf("Entro a accion 2 del vengador y su vida es %d\n", Vengador.vida);
+			printf("Entro a accion 2 del vengador y su poss es %d\n", Vengador.PossTablero);
+
+			printf("Entro a accion Ms vida %d\n", GeneradorMs.vida);
+		}
+		if(!VengadorSelected && glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS){
+			modelSelected = 1;
+			}	
+	
+	}
+	//--------------------------------------------------------
+	
 	else if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_RELEASE)
 		enableCountSelected = true;
 
