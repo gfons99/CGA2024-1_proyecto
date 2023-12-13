@@ -60,6 +60,9 @@
 int screenWidth;
 int screenHeight;
 
+float cursor_x = -0.5460;
+float cursor_y = 0.8330;
+
 const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
 
 GLFWwindow *window;
@@ -119,10 +122,15 @@ ShadowBox *shadowBox;
 GLuint textureCespedID, textureWallID, textureWindowID, textureHighwayID, textureLandingPadID;
 GLuint textureTerrainRID, textureTerrainGID, textureTerrainBID, textureTerrainBlendMapID;
 GLuint skyboxTextureID;
-GLuint textureInit1ID, textureInit2ID, textureActivaID, textureScreenID;
+GLuint txs_active;
+GLuint txs_main_title01, txs_main_title02, txs_main_title03;
+GLuint txs_gameplay_ui_personajes;
+GLuint txs_gameplay_efecto_ataque, txs_gameplay_efecto_defensa, txs_gameplay_efecto_velocidad;
 GLuint textureParticleFountainID;
 
 bool iniciaPartida = false, presionarOpcion = false;
+bool en_pantalla_de_juego = false;
+bool ena_key_enter = true, ena_key_left = true, ena_key_right = true;
 
 // Modelo para el render del texto
 FontTypeRendering::FontTypeRendering *modelText;
@@ -184,7 +192,7 @@ int stateDoor = 0;
 float dorRotCount = 0.0;
 
 //--------------------------------------------------------------------------------------------
-//bool Casilla_conbate=false ,Casilla_buffo = false, Casilla_jefe=false;
+// bool Casilla_conbate=false ,Casilla_buffo = false, Casilla_jefe=false;
 int buffo = 0;
 int combate = 0;
 int diceValue = 1; // Valor del dado
@@ -199,105 +207,109 @@ struct Dado InicializarDado(){
 
 //-----------------------------------------------------------------
 // Definición de una estructura para un personaje
-struct Personaje {
-    int ataque;
-    int defensa;
-    int vida;
-    int movimiento;
+struct Personaje
+{
+	int ataque;
+	int defensa;
+	int vida;
+	int movimiento;
 	int PossTablero;
 };
 
 // Función para inicializar un personaje basado en el tipo
-struct Personaje inicializarPersonaje(int tipo_personaje) {
-    struct Personaje personaje;
+struct Personaje inicializarPersonaje(int tipo_personaje)
+{
+	struct Personaje personaje;
 
-    switch (tipo_personaje) {
-        case 1:
-            personaje.ataque = 5;
-            personaje.defensa = 2;
-            personaje.vida = 6;
-            personaje.movimiento = 5;
-			personaje.PossTablero = 0;
-            break;
-        case 2:
-            personaje.ataque = 2;
-            personaje.defensa = 3;
-            personaje.vida = 10;
-            personaje.movimiento = 6;
-			personaje.PossTablero = 0;
-            break;
-        case 3:
-            personaje.ataque = 3;
-            personaje.defensa = 5;
-            personaje.vida = 8;
-            personaje.movimiento = 3;
-			personaje.PossTablero = 0;
-            break;
-        case 4:
-            personaje.ataque = 4;
-            personaje.defensa = 1;
-            personaje.vida = 10;
-            personaje.movimiento = 4;
-			personaje.PossTablero = 0;
-            break;
-        default:
-            // En caso de un tipo de personaje no reconocido, se inicializan todos los valores a 0
-            personaje.ataque = 0;
-            personaje.defensa = 0;
-            personaje.vida = 0;
-            personaje.movimiento = 0;
-			personaje.PossTablero = 0;
-            break;
-    }
+	switch (tipo_personaje)
+	{
+	case 1:
+		personaje.ataque = 5;
+		personaje.defensa = 2;
+		personaje.vida = 6;
+		personaje.movimiento = 5;
+		personaje.PossTablero = 0;
+		break;
+	case 2:
+		personaje.ataque = 2;
+		personaje.defensa = 3;
+		personaje.vida = 10;
+		personaje.movimiento = 6;
+		personaje.PossTablero = 0;
+		break;
+	case 3:
+		personaje.ataque = 3;
+		personaje.defensa = 5;
+		personaje.vida = 8;
+		personaje.movimiento = 3;
+		personaje.PossTablero = 0;
+		break;
+	case 4:
+		personaje.ataque = 4;
+		personaje.defensa = 1;
+		personaje.vida = 10;
+		personaje.movimiento = 4;
+		personaje.PossTablero = 0;
+		break;
+	default:
+		// En caso de un tipo de personaje no reconocido, se inicializan todos los valores a 0
+		personaje.ataque = 0;
+		personaje.defensa = 0;
+		personaje.vida = 0;
+		personaje.movimiento = 0;
+		personaje.PossTablero = 0;
+		break;
+	}
 
-    return personaje;
+	return personaje;
 }
 
-
 // Definición de una estructura para los monstruos
-struct Monstruo {
-    int ataque;
-    int defensa;
-    int vida;
+struct Monstruo
+{
+	int ataque;
+	int defensa;
+	int vida;
 };
 
 // Función para inicializar un monstruo basado en el tipo
-struct Monstruo inicializarMonstruo(int tipo_monstruo) {
-    struct Monstruo monstruo;
+struct Monstruo inicializarMonstruo(int tipo_monstruo)
+{
+	struct Monstruo monstruo;
 
-    switch (tipo_monstruo) {
-        case 0:
-            monstruo.ataque = 2;
-            monstruo.defensa = 3;
-            monstruo.vida = 3;
-            break;
-        case 1:
-            monstruo.ataque = 4;
-            monstruo.defensa = 2;
-            monstruo.vida = 5;
-            break;
-        case 2:
-            monstruo.ataque = 3;
-            monstruo.defensa = 1;
-            monstruo.vida = 8;
-            break;
-        case 3:
-            monstruo.ataque = 8;
-            monstruo.defensa = 5;
-            monstruo.vida = 50;
-            break;
-        default:
-            // En caso de un tipo de monstruo no reconocido, se inicializan todos los valores a 0
-            monstruo.ataque = 0;
-            monstruo.defensa = 0;
-            monstruo.vida = 0;
-            break;
-    }
+	switch (tipo_monstruo)
+	{
+	case 0:
+		monstruo.ataque = 2;
+		monstruo.defensa = 3;
+		monstruo.vida = 3;
+		break;
+	case 1:
+		monstruo.ataque = 4;
+		monstruo.defensa = 2;
+		monstruo.vida = 5;
+		break;
+	case 2:
+		monstruo.ataque = 3;
+		monstruo.defensa = 1;
+		monstruo.vida = 8;
+		break;
+	case 3:
+		monstruo.ataque = 8;
+		monstruo.defensa = 5;
+		monstruo.vida = 50;
+		break;
+	default:
+		// En caso de un tipo de monstruo no reconocido, se inicializan todos los valores a 0
+		monstruo.ataque = 0;
+		monstruo.defensa = 0;
+		monstruo.vida = 0;
+		break;
+	}
 
-    return monstruo;
+	return monstruo;
 }
 //------------------------------------------------------------------
-
 
 struct Personaje Cazador = inicializarPersonaje(0);
 struct Personaje Sanador = inicializarPersonaje(1);
@@ -310,77 +322,81 @@ struct Monstruo Hechicero = inicializarMonstruo(2);
 struct Monstruo Anfiteres = inicializarMonstruo(3);
 
 //--------------------------------------------------------------------
-Personaje Combate(Personaje Pj, Monstruo Ms){
+Personaje Combate(Personaje Pj, Monstruo Ms)
+{
 
 	// dados
-	int dadoPj=1+rand()%5;
-	int dadoMs=1+rand()%5;
-    // Cálculo del daño al monstruo y al personaje
-	
-    int damage_monstruo = (Pj.ataque + dadoPj) - Ms.vida + Ms.defensa; //daño que sufre MS
+	int dadoPj = 1 + rand() % 5;
+	int dadoMs = 1 + rand() % 5;
+	// Cálculo del daño al monstruo y al personaje
 
-	if(damage_monstruo < 0 ){
+	int damage_monstruo = (Pj.ataque + dadoPj) - Ms.vida + Ms.defensa; // daño que sufre MS
+
+	if (damage_monstruo < 0)
+	{
 		damage_monstruo = 0;
 	}
-    int damage_personaje =(Ms.ataque + dadoMs) - Pj.vida + Pj.defensa ; //daño que sufre PJ
+	int damage_personaje = (Ms.ataque + dadoMs) - Pj.vida + Pj.defensa; // daño que sufre PJ
 	if (damage_personaje < 0)
 	{
-		damage_personaje =0;
+		damage_personaje = 0;
 	}
-	
-	//daños 
-    Ms.vida -= damage_monstruo;
-    Pj.vida -= damage_personaje;
 
-    // Aquí podrías imprimir información sobre el combate
-    printf("El monstruo infligió %d de daño al personaje.\n", damage_personaje);
-    printf("El personaje infligió %d de daño al monstruo.\n", damage_monstruo);
+	// daños
+	Ms.vida -= damage_monstruo;
+	Pj.vida -= damage_personaje;
 
+	// Aquí podrías imprimir información sobre el combate
+	printf("El monstruo infligió %d de daño al personaje.\n", damage_personaje);
+	printf("El personaje infligió %d de daño al monstruo.\n", damage_monstruo);
 
-    return Pj; // Podrías devolver algún valor indicando el resultado del combate
+	return Pj; // Podrías devolver algún valor indicando el resultado del combate
 }
 
+int Tablero(Personaje Pj, int Mov, int dado)
+{
+	Pj.PossTablero = Mov + dado;
 
-int Tablero(Personaje Pj, int Mov, int dado) {
-    Pj.PossTablero= Mov + dado; 
+	int Tipo_Casilla = rand() % 2; // Considera incluir el valor 2 (rand() % 3) en lugar de 2 (rand() % 2) para cubrir todos los casos.
 
-    int Tipo_Casilla = rand() % 2; // Considera incluir el valor 2 (rand() % 3) en lugar de 2 (rand() % 2) para cubrir todos los casos.
+	// Monstruo Ms = inicializarMonstruo(1+rand() % 2); // Asegúrate de definir 'Ms' como un Monstruo.
+	int Tipo_MS = rand() % 2;
 
-    //Monstruo Ms = inicializarMonstruo(1+rand() % 2); // Asegúrate de definir 'Ms' como un Monstruo.
-	int Tipo_MS=rand() % 2;
+	Monstruo Ms = inicializarMonstruo(Tipo_MS);
 
-	Monstruo Ms=inicializarMonstruo(Tipo_MS);
+	// Monstruo MS =Esqueleto;
+	Monstruo Jefe = inicializarMonstruo(4);
+	buffo = rand() % 3;
+	switch (Tipo_Casilla)
+	{
+	case 0:
+		if (buffo == 1)
+		{
+			Pj.ataque = Pj.ataque + 2;
+		}
+		if (buffo == 2)
+		{
+			Pj.defensa = Pj.defensa + 2;
+		}
+		if (buffo == 3)
+		{
+			Pj.movimiento = Pj.movimiento + 2;
+		}
+		break;
 
-	//Monstruo MS =Esqueleto;
-	Monstruo Jefe =inicializarMonstruo(4);
-	buffo= rand() % 3;
-    switch (Tipo_Casilla) {
-        case 0:
-            if (buffo == 1) {
-                Pj.ataque = Pj.ataque + 2;
-            }
-            if (buffo == 2) {
-                Pj.defensa = Pj.defensa + 2;
-            }
-            if (buffo == 3) {
-                Pj.movimiento = Pj.movimiento + 2;
-            }
-            break;
+	case 1:
+		Combate(Pj, Ms); // Llama a la función de combate con el personaje y el monstruo.
+		break;
 
-        case 1:
-            Combate(Pj, Ms); // Llama a la función de combate con el personaje y el monstruo.
-            break;
+	case 2:
+		Combate(Pj, Jefe); // Llama a la función de combate con el personaje y el monstruo.
+		break;
 
-        case 2:
-            Combate(Pj, Jefe); // Llama a la función de combate con el personaje y el monstruo.
-            break;
-
-        default:
-            break;
-    }
-    return 0; // Añade un valor de retorno para la función.
+	default:
+		break;
+	}
+	return 0; // Añade un valor de retorno para la función.
 }
-
 
 // Lamps position
 std::vector<glm::vec3> lamp1Position = {
@@ -439,7 +455,8 @@ ALfloat source2Pos[] = {2.0, 0.0, 0.0};
 ALfloat source2Vel[] = {0.0, 0.0, 0.0};
 // Buffers
 ALuint buffer[NUM_BUFFERS];
-ALuint source[NUM_SOURCES];
+ALuint al_sources[NUM_SOURCES];
+ALuint al_music_sources[NUM_SOURCES];
 ALuint environment[NUM_ENVIRONMENTS];
 // Configs
 ALsizei size, freq;
@@ -447,6 +464,8 @@ ALenum format;
 ALvoid *data;
 int ch;
 ALboolean loop;
+std::vector<bool> al_music_play = {true, true, true};
+std::vector<bool> al_sounds_play = {true, true, true};
 std::vector<bool> sourcesPlay = {true, true, true};
 
 // Framesbuffers
@@ -793,7 +812,7 @@ void init(int width, int height, std::string strTitle, bool bFullScreen)
 	// Definiendo la textura
 	Texture textureBlendMap("../media/textures/blendMap.png");
 	textureBlendMap.loadImage();									  // Cargar la textura
-	glGenTextures(1, &textureTerrainBlendMapID);					  // Creando el id de la textura del landingpad
+	glGenTextures(1, &textureTerrainBlendMapID);					  // Creando el id de la textura
 	glBindTexture(GL_TEXTURE_2D, textureTerrainBlendMapID);			  // Se enlaza la textura
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	  // Wrapping en el eje u
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);	  // Wrapping en el eje v
@@ -811,50 +830,70 @@ void init(int width, int height, std::string strTitle, bool bFullScreen)
 	textureBlendMap.freeImage(); // Liberamos memoria
 
 	// Definiendo la textura
-	Texture textureIntro1("../media/textures/Intro1.png");
-	textureIntro1.loadImage();										  // Cargar la textura
-	glGenTextures(1, &textureInit1ID);								  // Creando el id de la textura del landingpad
-	glBindTexture(GL_TEXTURE_2D, textureInit1ID);					  // Se enlaza la textura
+	Texture texture_screen_01("../media/textures_screen/inicio_jugar.PNG");
+	texture_screen_01.loadImage();									  // Cargar la textura
+	glGenTextures(1, &txs_main_title01);							  // Creando el id de la textura
+	glBindTexture(GL_TEXTURE_2D, txs_main_title01);					  // Se enlaza la textura
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	  // Wrapping en el eje u
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);	  // Wrapping en el eje v
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // Filtering de minimización
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // Filtering de maximimizacion
-	if (textureIntro1.getData())
+	if (texture_screen_01.getData())
 	{
 		// Transferir los datos de la imagen a la tarjeta
-		glTexImage2D(GL_TEXTURE_2D, 0, textureIntro1.getChannels() == 3 ? GL_RGB : GL_RGBA, textureIntro1.getWidth(), textureIntro1.getHeight(), 0,
-					 textureIntro1.getChannels() == 3 ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, textureIntro1.getData());
+		glTexImage2D(GL_TEXTURE_2D, 0, texture_screen_01.getChannels() == 3 ? GL_RGB : GL_RGBA, texture_screen_01.getWidth(), texture_screen_01.getHeight(), 0,
+					 texture_screen_01.getChannels() == 3 ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, texture_screen_01.getData());
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	else
 		std::cout << "Fallo la carga de textura" << std::endl;
-	textureIntro1.freeImage(); // Liberamos memoria
+	texture_screen_01.freeImage(); // Liberamos memoria
 
 	// Definiendo la textura
-	Texture textureIntro2("../media/textures/Intro2.png");
-	textureIntro2.loadImage();										  // Cargar la textura
-	glGenTextures(1, &textureInit2ID);								  // Creando el id de la textura del landingpad
-	glBindTexture(GL_TEXTURE_2D, textureInit2ID);					  // Se enlaza la textura
+	Texture texture_screen_02("../media/textures_screen/inicio_opciones.PNG");
+	texture_screen_02.loadImage();									  // Cargar la textura
+	glGenTextures(1, &txs_main_title02);							  // Creando el id de la textura
+	glBindTexture(GL_TEXTURE_2D, txs_main_title02);					  // Se enlaza la textura
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	  // Wrapping en el eje u
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);	  // Wrapping en el eje v
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // Filtering de minimización
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // Filtering de maximimizacion
-	if (textureIntro2.getData())
+	if (texture_screen_02.getData())
 	{
 		// Transferir los datos de la imagen a la tarjeta
-		glTexImage2D(GL_TEXTURE_2D, 0, textureIntro2.getChannels() == 3 ? GL_RGB : GL_RGBA, textureIntro2.getWidth(), textureIntro2.getHeight(), 0,
-					 textureIntro2.getChannels() == 3 ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, textureIntro2.getData());
+		glTexImage2D(GL_TEXTURE_2D, 0, texture_screen_02.getChannels() == 3 ? GL_RGB : GL_RGBA, texture_screen_02.getWidth(), texture_screen_02.getHeight(), 0,
+					 texture_screen_02.getChannels() == 3 ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, texture_screen_02.getData());
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	else
 		std::cout << "Fallo la carga de textura" << std::endl;
-	textureIntro2.freeImage(); // Liberamos memoria
+	texture_screen_02.freeImage(); // Liberamos memoria
 
 	// Definiendo la textura
-	Texture textureScreen("../media/textures/Screen.png");
+	Texture texture_screen_03("../media/textures_screen/inicio_salir.PNG");
+	texture_screen_03.loadImage();									  // Cargar la textura
+	glGenTextures(1, &txs_main_title03);							  // Creando el id de la textura
+	glBindTexture(GL_TEXTURE_2D, txs_main_title03);					  // Se enlaza la textura
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	  // Wrapping en el eje u
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);	  // Wrapping en el eje v
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // Filtering de minimización
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // Filtering de maximimizacion
+	if (texture_screen_03.getData())
+	{
+		// Transferir los datos de la imagen a la tarjeta
+		glTexImage2D(GL_TEXTURE_2D, 0, texture_screen_03.getChannels() == 3 ? GL_RGB : GL_RGBA, texture_screen_03.getWidth(), texture_screen_03.getHeight(), 0,
+					 texture_screen_03.getChannels() == 3 ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, texture_screen_03.getData());
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+		std::cout << "Fallo la carga de textura" << std::endl;
+	texture_screen_03.freeImage(); // Liberamos memoria
+
+	// Definiendo la textura
+	Texture textureScreen("../media/textures/ui_personajes_00.png");
 	textureScreen.loadImage();										  // Cargar la textura
-	glGenTextures(1, &textureScreenID);								  // Creando el id de la textura del landingpad
-	glBindTexture(GL_TEXTURE_2D, textureScreenID);					  // Se enlaza la textura
+	glGenTextures(1, &txs_gameplay_ui_personajes);					  // Creando el id de la textura del landingpad
+	glBindTexture(GL_TEXTURE_2D, txs_gameplay_ui_personajes);		  // Se enlaza la textura
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	  // Wrapping en el eje u
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);	  // Wrapping en el eje v
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // Filtering de minimización
@@ -869,6 +908,70 @@ void init(int width, int height, std::string strTitle, bool bFullScreen)
 	else
 		std::cout << "Fallo la carga de textura" << std::endl;
 	textureScreen.freeImage(); // Liberamos memoria
+
+	// ****************************************************************
+	// init(): EFECTOS
+	// ****************************************************************
+
+	// Definiendo la textura
+	Texture texture_efecto_01("../media/textures_screen/efecto_ataque.PNG");
+	texture_efecto_01.loadImage();										  // Cargar la textura
+	glGenTextures(1, &txs_gameplay_efecto_ataque);					  // Creando el id de la textura del landingpad
+	glBindTexture(GL_TEXTURE_2D, txs_gameplay_efecto_ataque);		  // Se enlaza la textura
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	  // Wrapping en el eje u
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);	  // Wrapping en el eje v
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // Filtering de minimización
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // Filtering de maximimizacion
+	if (texture_efecto_01.getData())
+	{
+		// Transferir los datos de la imagen a la tarjeta
+		glTexImage2D(GL_TEXTURE_2D, 0, texture_efecto_01.getChannels() == 3 ? GL_RGB : GL_RGBA, texture_efecto_01.getWidth(), texture_efecto_01.getHeight(), 0,
+					 texture_efecto_01.getChannels() == 3 ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, texture_efecto_01.getData());
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+		std::cout << "Fallo la carga de textura" << std::endl;
+	texture_efecto_01.freeImage(); // Liberamos memoria
+
+	// Definiendo la textura
+	Texture texture_efecto_02("../media/textures_screen/efecto_defensa.PNG");
+	texture_efecto_02.loadImage();										  // Cargar la textura
+	glGenTextures(1, &txs_gameplay_efecto_defensa);					  // Creando el id de la textura del landingpad
+	glBindTexture(GL_TEXTURE_2D, txs_gameplay_efecto_defensa);		  // Se enlaza la textura
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	  // Wrapping en el eje u
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);	  // Wrapping en el eje v
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // Filtering de minimización
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // Filtering de maximimizacion
+	if (texture_efecto_02.getData())
+	{
+		// Transferir los datos de la imagen a la tarjeta
+		glTexImage2D(GL_TEXTURE_2D, 0, texture_efecto_02.getChannels() == 3 ? GL_RGB : GL_RGBA, texture_efecto_02.getWidth(), texture_efecto_02.getHeight(), 0,
+					 texture_efecto_02.getChannels() == 3 ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, texture_efecto_02.getData());
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+		std::cout << "Fallo la carga de textura" << std::endl;
+	texture_efecto_02.freeImage(); // Liberamos memoria
+
+	// Definiendo la textura
+	Texture texture_efecto_03("../media/textures_screen/efecto_velocidad.PNG");
+	texture_efecto_03.loadImage();										  // Cargar la textura
+	glGenTextures(1, &txs_gameplay_efecto_velocidad);					  // Creando el id de la textura del landingpad
+	glBindTexture(GL_TEXTURE_2D, txs_gameplay_efecto_velocidad);		  // Se enlaza la textura
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	  // Wrapping en el eje u
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);	  // Wrapping en el eje v
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // Filtering de minimización
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // Filtering de maximimizacion
+	if (texture_efecto_03.getData())
+	{
+		// Transferir los datos de la imagen a la tarjeta
+		glTexImage2D(GL_TEXTURE_2D, 0, texture_efecto_03.getChannels() == 3 ? GL_RGB : GL_RGBA, texture_efecto_03.getWidth(), texture_efecto_03.getHeight(), 0,
+					 texture_efecto_03.getChannels() == 3 ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, texture_efecto_03.getData());
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+		std::cout << "Fallo la carga de textura" << std::endl;
+	texture_efecto_03.freeImage(); // Liberamos memoria
 
 	// Definiendo la textura
 	Texture textureParticlesFountain("../media/textures/bluewater.png");
@@ -909,7 +1012,9 @@ void init(int width, int height, std::string strTitle, bool bFullScreen)
 	}
 	// Generate buffers, or else no sound will happen!
 	alGenBuffers(NUM_BUFFERS, buffer);
-	buffer[0] = alutCreateBufferFromFile("../media/sounds/fountain.wav");
+	buffer[0] = alutCreateBufferFromFile("../media/music/20210702_The First Town.wav");
+	buffer[1] = alutCreateBufferFromFile("../media/sounds/zapsplat_fantasy_magic_wand_ping_bell_chime_classic_simple_001_92714.wav");
+	buffer[2] = alutCreateBufferFromFile("../media/sounds/zapsplat_multimedia_game_sound_fun_magic_game_positive_bonus_award_level_up_003_61003.wav");
 	int errorAlut = alutGetError();
 	if (errorAlut != ALUT_ERROR_NO_ERROR)
 	{
@@ -918,7 +1023,7 @@ void init(int width, int height, std::string strTitle, bool bFullScreen)
 	}
 
 	alGetError(); /* clear error */
-	alGenSources(NUM_SOURCES, source);
+	alGenSources(NUM_SOURCES, al_sources);
 
 	if (alGetError() != AL_NO_ERROR)
 	{
@@ -929,29 +1034,17 @@ void init(int width, int height, std::string strTitle, bool bFullScreen)
 	{
 		printf("init - no errors after alGenSources\n");
 	}
-	alSourcef(source[0], AL_PITCH, 1.0f);
-	alSourcef(source[0], AL_GAIN, 3.0f);
-	alSourcefv(source[0], AL_POSITION, source0Pos);
-	alSourcefv(source[0], AL_VELOCITY, source0Vel);
-	alSourcei(source[0], AL_BUFFER, buffer[0]);
-	alSourcei(source[0], AL_LOOPING, AL_TRUE);
-	alSourcef(source[0], AL_MAX_DISTANCE, 2000);
+	alSourcef(al_sources[0], AL_PITCH, 1.0f);
+	alSourcef(al_sources[0], AL_GAIN, 0.3f);
+	alSourcefv(al_sources[0], AL_VELOCITY, source0Vel);
+	alSourcei(al_sources[0], AL_BUFFER, buffer[0]);
+	alSourcei(al_sources[0], AL_LOOPING, AL_TRUE);
 
-	alSourcef(source[1], AL_PITCH, 1.0f);
-	alSourcef(source[1], AL_GAIN, 0.5f);
-	alSourcefv(source[1], AL_POSITION, source1Pos);
-	alSourcefv(source[1], AL_VELOCITY, source1Vel);
-	alSourcei(source[1], AL_BUFFER, buffer[1]);
-	alSourcei(source[1], AL_LOOPING, AL_TRUE);
-	alSourcef(source[1], AL_MAX_DISTANCE, 1000);
-
-	alSourcef(source[2], AL_PITCH, 1.0f);
-	alSourcef(source[2], AL_GAIN, 0.3f);
-	alSourcefv(source[2], AL_POSITION, source2Pos);
-	alSourcefv(source[2], AL_VELOCITY, source2Vel);
-	alSourcei(source[2], AL_BUFFER, buffer[2]);
-	alSourcei(source[2], AL_LOOPING, AL_TRUE);
-	alSourcef(source[2], AL_MAX_DISTANCE, 2000);
+	alSourcef(al_sources[1], AL_PITCH, 1.0f);
+	alSourcef(al_sources[1], AL_GAIN, 0.5f);
+	alSourcefv(al_sources[1], AL_VELOCITY, source1Vel);
+	alSourcei(al_sources[1], AL_BUFFER, buffer[1]);
+	alSourcei(al_sources[1], AL_LOOPING, AL_FALSE);
 
 	/*******************************************
 	 * Inicializacion del framebuffer para
@@ -1019,9 +1112,13 @@ void destroy()
 	glDeleteTextures(1, &textureTerrainGID);
 	glDeleteTextures(1, &textureTerrainRID);
 	glDeleteTextures(1, &textureTerrainBlendMapID);
-	glDeleteTextures(1, &textureInit1ID);
-	glDeleteTextures(1, &textureInit2ID);
-	glDeleteTextures(1, &textureScreenID);
+	glDeleteTextures(1, &txs_main_title01);
+	glDeleteTextures(1, &txs_main_title02);
+	glDeleteTextures(1, &txs_main_title03);
+	glDeleteTextures(1, &txs_gameplay_ui_personajes);
+	glDeleteTextures(1, &txs_gameplay_efecto_ataque);
+	glDeleteTextures(1, &txs_gameplay_efecto_defensa);
+	glDeleteTextures(1, &txs_gameplay_efecto_velocidad);
 	glDeleteTextures(1, &textureParticleFountainID);
 
 	// Cube Maps Delete
@@ -1092,22 +1189,82 @@ bool processInput(bool continueApplication)
 	{
 		return false;
 	}
+
+	// ****************************************************************
+	// processInput(): TITLE SCREEM
+	// ****************************************************************
+	if (!iniciaPartida)
+	{
+		if (txs_active == txs_main_title01)
+		{
+			if (ena_key_enter && glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS)
+			{
+				iniciaPartida = true;
+				txs_active = txs_gameplay_ui_personajes;
+				alSourcePlay(al_sources[1]);
+			}
+			else if (ena_key_left && glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+			{
+				ena_key_left = false;
+				txs_active = txs_main_title02;
+				alSourcePlay(al_sources[1]);
+			}
+			else if (ena_key_right && glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+			{
+				ena_key_right = false;
+				txs_active = txs_main_title03;
+				alSourcePlay(al_sources[1]);
+			}
+		}
+		else if (txs_active == txs_main_title02)
+		{
+			if (ena_key_right && glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+			{
+				ena_key_right = false;
+				txs_active = txs_main_title01;
+				alSourcePlay(al_sources[1]);
+			}
+		}
+		else if (txs_active == txs_main_title03)
+		{
+			if (ena_key_left && glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+			{
+				ena_key_left = false;
+				txs_active = txs_main_title01;
+				alSourcePlay(al_sources[1]);
+			}
+		}
+
+		if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_RELEASE)
+		{
+			ena_key_enter = true;
+		}
+		if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_RELEASE)
+		{
+			ena_key_left = true;
+		}
+		if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_RELEASE)
+		{
+			ena_key_right = true;
+		}
+	}
+
 	// ****************************************************************
 	// processInput(): CÁMARAS
 	// ****************************************************************
 	if (cameraState == "libre")
 	{
 		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-			camera1P->moveFrontCamera(true, deltaTime*2);
+			camera1P->moveFrontCamera(true, deltaTime * 2);
 		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-			camera1P->moveFrontCamera(false, deltaTime*2);
+			camera1P->moveFrontCamera(false, deltaTime * 2);
 		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-			camera1P->moveRightCamera(false, deltaTime*2);
+			camera1P->moveRightCamera(false, deltaTime * 2);
 		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-			camera1P->moveRightCamera(true, deltaTime*2);
-		
+			camera1P->moveRightCamera(true, deltaTime * 2);
+
 		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
-			camera1P->mouseMoveCamera(offsetX, offsetY, deltaTime*2);
+			camera1P->mouseMoveCamera(offsetX, offsetY, deltaTime * 2);
 	}
 	else if (cameraState == "tercera_p")
 	{
@@ -1119,24 +1276,24 @@ bool processInput(bool continueApplication)
 	offsetX = 0;
 	offsetY = 0;
 
-	if (!iniciaPartida)
+	// ****************************************************************
+	// processInput(): FLECHAS
+	// ****************************************************************
+	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
 	{
-		bool presionarEnter = glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS;
-		if (textureActivaID == textureInit1ID && presionarEnter)
-		{
-			iniciaPartida = true;
-			textureActivaID = textureScreenID;
-		}
-		else if (!presionarOpcion && glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
-		{
-			presionarOpcion = true;
-			if (textureActivaID == textureInit1ID)
-				textureActivaID = textureInit2ID;
-			else if (textureActivaID == textureInit2ID)
-				textureActivaID = textureInit1ID;
-		}
-		else if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_RELEASE)
-			presionarOpcion = false;
+		cursor_y += 0.001;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+	{
+		cursor_y -= 0.001;
+	}
+	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+	{
+		cursor_x -= 0.001;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+	{
+		cursor_x += 0.001;
 	}
 
 	if (glfwJoystickPresent(GLFW_JOYSTICK_1) == GL_TRUE)
@@ -1242,10 +1399,10 @@ void renderSolidScene()
 	glBindTexture(GL_TEXTURE_2D, textureTerrainBlendMapID);
 	shaderTerrain.setInt("blendMapTexture", 4);
 	shaderTerrain.setVectorFloat2("scaleUV", glm::value_ptr(glm::vec2(80, 80)));
-	
+
 	terrain.setPosition(glm::vec3(100, 0, 100));
 	terrain.render();
-	
+
 	shaderTerrain.setVectorFloat2("scaleUV", glm::value_ptr(glm::vec2(0, 0)));
 	glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -1294,9 +1451,6 @@ void renderAlphaScene(bool render = true)
 		blendingSorted[distanceFromView] = std::make_pair(itblend->first, itblend->second);
 	}
 
-	/**********
-	 * Render de las transparencias
-	 */
 	// ****************************************************************
 	// renderAlphaScene(): MODELOS TRANSPARENTES
 	// ****************************************************************
@@ -1316,13 +1470,35 @@ void renderAlphaScene(bool render = true)
 		shaderTexture.setMatrix4("projection", 1, false, glm::value_ptr(glm::mat4(1.0)));
 		shaderTexture.setMatrix4("view", 1, false, glm::value_ptr(glm::mat4(1.0)));
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, textureActivaID);
+		glBindTexture(GL_TEXTURE_2D, txs_active);
 		shaderTexture.setInt("outTexture", 0);
 		glEnable(GL_BLEND);
 		boxIntro.render();
 		glDisable(GL_BLEND);
 
-		modelText->render("Texto en OpenGL", -1, 0);
+		// Coordenadas de 1 a 0 (nota: alineadas a la izquierda)
+
+		// std::cout << "cursor_x: " << cursor_x << std::endl;
+		// std::cout << "cursor_y: " << cursor_y << std::endl;
+		modelText->render("001/100", -0.5460, 0.8330);
+
+		modelText->render("002/100", -0.0540, 0.8330);
+
+		modelText->render("003/100", 0.4229, 0.8330);
+
+		modelText->render("004/100", 0.8939, 0.8330);
+
+		// cursor_x: -0.5460
+		// cursor_y: 0.8330
+
+		// cursor_x: -0.0540
+		// cursor_y: 0.8330
+
+		// cursor_x: 0.4229
+		// cursor_y: 0.8330
+
+		// cursor_x: 0.8939
+		// cursor_y: 0.8330
 	}
 }
 
@@ -1343,7 +1519,6 @@ void applicationLoop()
 	glm::vec3 axis;
 	glm::vec3 target;
 	float angleTarget;
-	
 
 	int state = 0;
 	float advanceCount = 0.0;
@@ -1361,12 +1536,13 @@ void applicationLoop()
 
 	lastTime = TimeManager::Instance().GetTime();
 
-	textureActivaID = textureInit1ID;
+	txs_active = txs_main_title01;
 
 	glm::vec3 lightPos = glm::vec3(10.0, 10.0, -10.0);
 
 	shadowBox = new ShadowBox(-lightPos, camera1P.get(), 15.0f, 0.1f, 45.0f);
 
+	std::cout << "BEFORE PSI" << std::endl;
 	while (psi)
 	{
 		currTime = TimeManager::Instance().GetTime();
@@ -1443,7 +1619,7 @@ void applicationLoop()
 		/*******************************************
 		 * Propiedades de neblina
 		 *******************************************/
-		glm::vec3 color_fog = glm::vec3(71.5/255, 106.7/255, 132.6/255);
+		glm::vec3 color_fog = glm::vec3(71.5 / 255, 106.7 / 255, 132.6 / 255);
 		shaderMulLighting.setVectorFloat3("fogColor", glm::value_ptr(color_fog));
 		shaderTerrain.setVectorFloat3("fogColor", glm::value_ptr(color_fog));
 		shaderSkybox.setVectorFloat3("fogColor", glm::value_ptr(color_fog));
@@ -1544,19 +1720,44 @@ void applicationLoop()
 			shaderTerrain.setFloat("pointLights[" + std::to_string(lamp1Position.size() + i) + "].quadratic", 0.02);
 		}
 
-		/************Render de imagen de frente**************/
+		// OpenAL
+
+		// Set up the listener
+		ALfloat listenerPos[] = {0.0, 0.0, 0.0};				 // Listener position (x, y, z)
+		ALfloat listenerVel[] = {0.0, 0.0, 0.0};				 // Listener velocity
+		ALfloat listenerOri[] = {0.0, 0.0, -1.0, 0.0, 1.0, 0.0}; // Listener orientation (at, up)
+		alListenerfv(AL_POSITION, listenerPos);
+		alListenerfv(AL_VELOCITY, listenerVel);
+		alListenerfv(AL_ORIENTATION, listenerOri);
+
+		// std::cout << "TITLE SCREEN" << std::endl;
+		// ****************************************************************
+		// applicationLoop(): while(psi): Render de la imagen de frente
+		// ****************************************************************
 		if (!iniciaPartida)
 		{
+			if (al_music_play[0])
+			{
+				al_music_play[0] = false;
+				alSourcePlay(al_sources[0]);
+			}
+
 			shaderTexture.setMatrix4("projection", 1, false, glm::value_ptr(glm::mat4(1.0)));
 			shaderTexture.setMatrix4("view", 1, false, glm::value_ptr(glm::mat4(1.0)));
 			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, textureActivaID);
+			glBindTexture(GL_TEXTURE_2D, txs_active);
 			shaderTexture.setInt("outTexture", 0);
 			boxIntro.render();
 			glfwSwapBuffers(window);
 			continue;
 		}
+		else if (!en_pantalla_de_juego)
+		{
+			en_pantalla_de_juego = true;
+			alDeleteSources(1, al_sources);
+		}
 
+		// std::cout << "GAME STARTED" << std::endl;
 		/*******************************************
 		 * 1.- We render the depth buffer
 		 *******************************************/
@@ -1729,18 +1930,20 @@ void applicationLoop()
 		glfwSwapBuffers(window);
 
 		// ****************************************************************
-		// OpenAL (sound data)
+		// applicationLoop(): while(psi): OpenAL (sound data)
 		// ****************************************************************
+
 		source0Pos[0] = modelMatrixFountain[3].x;
 		source0Pos[1] = modelMatrixFountain[3].y;
 		source0Pos[2] = modelMatrixFountain[3].z;
-		alSourcefv(source[0], AL_POSITION, source0Pos);
+		alSourcefv(al_sources[0], AL_POSITION, source0Pos);
 
 		// Listener for the First person camera
 		listenerPos[0] = camera1P->getPosition().x;
 		listenerPos[1] = camera1P->getPosition().y;
 		listenerPos[2] = camera1P->getPosition().z;
 		alListenerfv(AL_POSITION, listenerPos);
+
 		listenerOri[0] = camera1P->getFront().x;
 		listenerOri[1] = camera1P->getFront().y;
 		listenerOri[2] = camera1P->getFront().z;
@@ -1754,7 +1957,7 @@ void applicationLoop()
 			if (sourcesPlay[i])
 			{
 				sourcesPlay[i] = false;
-				alSourcePlay(source[i]);
+				alSourcePlay(al_sources[i]);
 			}
 		}
 	}
@@ -1762,7 +1965,7 @@ void applicationLoop()
 
 int main(int argc, char **argv)
 {
-	init(800, 700, "Window GLFW", false);
+	init(1280, 720, "Window GLFW", false);
 	applicationLoop();
 	destroy();
 	return 1;
