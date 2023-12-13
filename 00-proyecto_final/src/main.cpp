@@ -112,7 +112,7 @@ Box boxViewDepth;
 // Fountain
 Model modelFountain;
 
-//objetos PJ y MS
+// objetos PJ y MS
 Model ModelCazador;
 Model ModelSanador;
 Model ModelCaballero;
@@ -179,7 +179,6 @@ int lastMousePosY, offsetY = 0;
 // Model matrix definitions
 glm::mat4 modelMatrixFountain = glm::mat4(1.0f);
 
-
 glm::mat4 ModelMatrixCazador = glm::mat4(1.0f);
 glm::mat4 ModelMatrixSanador = glm::mat4(1.0f);
 glm::mat4 ModelMatrixCaballero = glm::mat4(1.0f);
@@ -189,9 +188,6 @@ glm::mat4 ModelMatrixEsqueleto = glm::mat4(1.0f);
 glm::mat4 ModelMatrixDemonio = glm::mat4(1.0f);
 glm::mat4 ModelMatrixHechicero = glm::mat4(1.0f);
 glm::mat4 ModelMatrixAnfiteres = glm::mat4(1.0f);
-
-
-
 
 // ****************************************************************
 // VARIABLES DE ANIMACIÓN
@@ -230,116 +226,119 @@ int diceValue = 1; // Valor del dado
 //--------------------------------------------------------------------------------------------
 //-----------------------------------------------------------------
 // Definición de una estructura para un personaje
-struct Personaje {
+struct Personaje
+{
 	int TipoPj;
-    int ataque;
-    int defensa;
-    int vida;
-    int movimiento;
+	int ataque;
+	int defensa;
+	int vida;
+	int movimiento;
 	int PossTablero;
 	int TiradaSalvacion;
-	
 };
 
 // Función para inicializar un personaje basado en el tipo
-struct Personaje inicializarPersonaje(int tipo_personaje) {
-    struct Personaje personaje;
+struct Personaje inicializarPersonaje(int tipo_personaje)
+{
+	struct Personaje personaje;
 
-    switch (tipo_personaje) {
-        case 1:
-			personaje.TipoPj=1;
-            personaje.ataque = 5;
-            personaje.defensa = 2;
-            personaje.vida = 6;
-            personaje.movimiento = 5;
-			personaje.PossTablero = 0;
-			personaje.TiradaSalvacion = 4;
-            break;
-        case 2:
-			personaje.TipoPj=2;
-            personaje.ataque = 2;
-            personaje.defensa = 3;
-            personaje.vida = 10;
-            personaje.movimiento = 6;
-			personaje.PossTablero = 0;
-			personaje.TiradaSalvacion = 3;
-            break;
-        case 3:
-			personaje.TipoPj=3;
-            personaje.ataque = 3;
-            personaje.defensa = 5;
-            personaje.vida = 8;
-            personaje.movimiento = 3;
-			personaje.PossTablero = 0;
-			personaje.TiradaSalvacion = 4;
-            break;
-        case 4:
-			personaje.TipoPj=4;
-            personaje.ataque = 4;
-            personaje.defensa = 1;
-            personaje.vida = 10;
-            personaje.movimiento = 4;
-			personaje.PossTablero = 0;
-			personaje.TiradaSalvacion = 5;
-            break;
-        default:
-            // En caso de un tipo de personaje no reconocido, se inicializan todos los valores a 0
-            personaje.ataque = 0;
-            personaje.defensa = 0;
-            personaje.vida = 0;
-            personaje.movimiento = 0;
-			personaje.PossTablero = 0;
-			personaje.TiradaSalvacion = 0;
-            break;
-    }
+	switch (tipo_personaje)
+	{
+	case 1:
+		personaje.TipoPj = 1;
+		personaje.ataque = 5;
+		personaje.defensa = 2;
+		personaje.vida = 6;
+		personaje.movimiento = 5;
+		personaje.PossTablero = 0;
+		personaje.TiradaSalvacion = 4;
+		break;
+	case 2:
+		personaje.TipoPj = 2;
+		personaje.ataque = 2;
+		personaje.defensa = 3;
+		personaje.vida = 10;
+		personaje.movimiento = 6;
+		personaje.PossTablero = 0;
+		personaje.TiradaSalvacion = 3;
+		break;
+	case 3:
+		personaje.TipoPj = 3;
+		personaje.ataque = 3;
+		personaje.defensa = 5;
+		personaje.vida = 8;
+		personaje.movimiento = 3;
+		personaje.PossTablero = 0;
+		personaje.TiradaSalvacion = 4;
+		break;
+	case 4:
+		personaje.TipoPj = 4;
+		personaje.ataque = 4;
+		personaje.defensa = 1;
+		personaje.vida = 10;
+		personaje.movimiento = 4;
+		personaje.PossTablero = 0;
+		personaje.TiradaSalvacion = 5;
+		break;
+	default:
+		// En caso de un tipo de personaje no reconocido, se inicializan todos los valores a 0
+		personaje.ataque = 0;
+		personaje.defensa = 0;
+		personaje.vida = 0;
+		personaje.movimiento = 0;
+		personaje.PossTablero = 0;
+		personaje.TiradaSalvacion = 0;
+		break;
+	}
 
-    return personaje;
+	return personaje;
 }
 
-
 // Definición de una estructura para los monstruos
-struct Monstruo {
-    int ataque;
-    int defensa;
-    int vida;
+struct Monstruo
+{
+	int ataque;
+	int defensa;
+	int vida;
 };
 
 // Función para inicializar un monstruo basado en el tipo
-struct Monstruo inicializarMonstruo(int tipo_monstruo) {
-    struct Monstruo monstruo;
+struct Monstruo inicializarMonstruo(int tipo_monstruo)
+{
+	struct Monstruo monstruo;
 
-    switch (tipo_monstruo) {
-        case 0:
-            monstruo.ataque = 2;
-            monstruo.defensa = 3;
-            monstruo.vida = 3;
-            break;
-        case 1:
-            monstruo.ataque = 4;
-            monstruo.defensa = 2;
-            monstruo.vida = 5;
-            break;
-        case 2:
-            monstruo.ataque = 3;
-            monstruo.defensa = 1;
-            monstruo.vida = 8;
-            break;
-        case 3:
-            monstruo.ataque = 8;
-            monstruo.defensa = 5;
-            monstruo.vida = 50;
-            break;
-        default:
-            // En caso de un tipo de monstruo no reconocido, se inicializan todos los valores a 0
-            monstruo.ataque = 0;
-            monstruo.defensa = 0;
-            monstruo.vida = 0;
-            break;
-    }
+	switch (tipo_monstruo)
+	{
+	case 0:
+		monstruo.ataque = 2;
+		monstruo.defensa = 3;
+		monstruo.vida = 3;
+		break;
+	case 1:
+		monstruo.ataque = 4;
+		monstruo.defensa = 2;
+		monstruo.vida = 5;
+		break;
+	case 2:
+		monstruo.ataque = 3;
+		monstruo.defensa = 1;
+		monstruo.vida = 8;
+		break;
+	case 3:
+		monstruo.ataque = 8;
+		monstruo.defensa = 5;
+		monstruo.vida = 50;
+		break;
+	default:
+		// En caso de un tipo de monstruo no reconocido, se inicializan todos los valores a 0
+		monstruo.ataque = 0;
+		monstruo.defensa = 0;
+		monstruo.vida = 0;
+		break;
+	}
 
-    return monstruo;
+	return monstruo;
 }
-
 
 //------------------------------------------------------------------
 
@@ -353,94 +352,105 @@ struct Monstruo Anfiteres = inicializarMonstruo(3);
 
 //--------------------------------------------------------------------
 
-void Combate(Personaje *Pj, Monstruo *Ms) {
-    printf("Entraste al combate.\n");
-    // Dados
-    int dadoPj = 1 + rand() % 6;
-    int dadoMs = 1 + rand() % 6;
+void Combate(Personaje *Pj, Monstruo *Ms)
+{
+	printf("Entraste al combate.\n");
+	// Dados
+	int dadoPj = 1 + rand() % 6;
+	int dadoMs = 1 + rand() % 6;
 
-    // Cálculo del daño al monstruo y al personaje
-    printf("El monstruo tiro dado de %d.\n", dadoMs);
-    printf("El personaje tiro dado de %d.\n", dadoPj);
+	// Cálculo del daño al monstruo y al personaje
+	printf("El monstruo tiro dado de %d.\n", dadoMs);
+	printf("El personaje tiro dado de %d.\n", dadoPj);
 
-    int damage_monstruo = (Pj->ataque + dadoPj) - Ms->defensa; // Daño que sufre MS
-    if (damage_monstruo < 0) {
-        damage_monstruo = 0;
-    }
-    int damage_personaje = (Ms->ataque + dadoMs) - Pj->defensa; // Daño que sufre PJ
-    if (damage_personaje < 0) {
-        damage_personaje = 0;
-    }
+	int damage_monstruo = (Pj->ataque + dadoPj) - Ms->defensa; // Daño que sufre MS
+	if (damage_monstruo < 0)
+	{
+		damage_monstruo = 0;
+	}
+	int damage_personaje = (Ms->ataque + dadoMs) - Pj->defensa; // Daño que sufre PJ
+	if (damage_personaje < 0)
+	{
+		damage_personaje = 0;
+	}
 
-    // Daños
-    Ms->vida -= damage_monstruo;
-    Pj->vida -= damage_personaje;
+	// Daños
+	Ms->vida -= damage_monstruo;
+	Pj->vida -= damage_personaje;
 
 	printf("La vida de Ms  %d \n", Ms->vida);
-    printf("La vida de Pj %d \n", Pj->vida);
+	printf("La vida de Pj %d \n", Pj->vida);
 
-    // Información sobre el combate
-    printf("El monstruo infligio %d de dano al personaje.\n", damage_personaje);
-    printf("El personaje infligio %d de dano al monstruo.\n", damage_monstruo);
+	// Información sobre el combate
+	printf("El monstruo infligio %d de dano al personaje.\n", damage_personaje);
+	printf("El personaje infligio %d de dano al monstruo.\n", damage_monstruo);
 }
 
-
-Monstruo MostruosGenerdor(Monstruo GeneradorMs){
-	if(GeneradorMs.vida<=0){
-		int Tipo_Ms= rand()%2;
+Monstruo MostruosGenerdor(Monstruo GeneradorMs)
+{
+	if (GeneradorMs.vida <= 0)
+	{
+		int Tipo_Ms = rand() % 2;
 		GeneradorMs = inicializarMonstruo(Tipo_Ms);
 		printf("se genero un nuevo moutruo \n");
 	}
-	
+
 	return GeneradorMs;
 }
 
-Personaje TiradaDeSalvacion(Personaje Pj){
+Personaje TiradaDeSalvacion(Personaje Pj)
+{
 	printf("Se realizao tirada de salvacion \n");
-		int DadoSalvacion = 1+rand()%6;
-		if(Pj.TiradaSalvacion <= DadoSalvacion){
-			Pj=inicializarPersonaje(Pj.TipoPj);	
-			printf("Tirada de salvacion exitosa\n");
-		}
+	int DadoSalvacion = 1 + rand() % 6;
+	if (Pj.TiradaSalvacion <= DadoSalvacion)
+	{
+		Pj = inicializarPersonaje(Pj.TipoPj);
+		printf("Tirada de salvacion exitosa\n");
+	}
 	return Pj;
 }
 
-void Tablero(Personaje *Pj, int dado, Monstruo *Ms, Monstruo *Anfiteres) {
-    printf("Entraste al tablero.\n");
-    Pj->PossTablero = Pj->movimiento + dado;
+void Tablero(Personaje *Pj, int dado, Monstruo *Ms, Monstruo *Anfiteres)
+{
+	printf("Entraste al tablero.\n");
+	Pj->PossTablero = Pj->movimiento + dado;
 
-    int Tipo_Casilla =1 + rand() % 3;
+	int Tipo_Casilla = 1 + rand() % 3;
 
-    int buffo = 1 + rand() % 3;
-    switch (Tipo_Casilla) {
-        case 1:
-            if (buffo == 1) {
-                Pj->ataque += 2;
-                printf("Buffo 1\n");
-            }
-            if (buffo == 2) {
-                Pj->defensa += 2;
-                printf("Buffo 2\n");
-            }
-            if (buffo == 3) {
-                Pj->movimiento += 2;
-                printf("Buffo 3\n");
-            }
-            break;
+	int buffo = 1 + rand() % 3;
+	switch (Tipo_Casilla)
+	{
+	case 1:
+		if (buffo == 1)
+		{
+			Pj->ataque += 2;
+			printf("Buffo 1\n");
+		}
+		if (buffo == 2)
+		{
+			Pj->defensa += 2;
+			printf("Buffo 2\n");
+		}
+		if (buffo == 3)
+		{
+			Pj->movimiento += 2;
+			printf("Buffo 3\n");
+		}
+		break;
 
-        case 2:
-            Combate(Pj, Ms);
-            printf("Combate con monstruo.\n");
-            break;
+	case 2:
+		Combate(Pj, Ms);
+		printf("Combate con monstruo.\n");
+		break;
 
-        case 3:
-            Combate(Pj, Anfiteres);
-            printf("Combate con jefe.\n");
-            break;
+	case 3:
+		Combate(Pj, Anfiteres);
+		printf("Combate con jefe.\n");
+		break;
 
-        default:
-            break;
-    }
+	default:
+		break;
+	}
 }
 //---------------------------------------------------------------constructores
 
@@ -736,7 +746,7 @@ void init(int width, int height, std::string strTitle, bool bFullScreen)
 	camera3P->setSensitivity(1.0f);
 	camera3P->setDistanceFromTarget(distanceFromTarget);
 
-	//models*************************************************************
+	// models*************************************************************
 	ModelCazador.loadModel("../media/models/Cazador/Cazadora.fbx");
 	ModelCazador.setShader(&shaderMulLighting);
 	ModelSanador.loadModel("../media/models/Sanador/Sanador.fbx");
@@ -981,7 +991,7 @@ void init(int width, int height, std::string strTitle, bool bFullScreen)
 
 	// Definiendo la textura
 	Texture texture_efecto_01("../media/textures_screen/efecto_ataque.PNG");
-	texture_efecto_01.loadImage();										  // Cargar la textura
+	texture_efecto_01.loadImage();									  // Cargar la textura
 	glGenTextures(1, &txs_gameplay_efecto_ataque);					  // Creando el id de la textura del landingpad
 	glBindTexture(GL_TEXTURE_2D, txs_gameplay_efecto_ataque);		  // Se enlaza la textura
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	  // Wrapping en el eje u
@@ -1001,7 +1011,7 @@ void init(int width, int height, std::string strTitle, bool bFullScreen)
 
 	// Definiendo la textura
 	Texture texture_efecto_02("../media/textures_screen/efecto_defensa.PNG");
-	texture_efecto_02.loadImage();										  // Cargar la textura
+	texture_efecto_02.loadImage();									  // Cargar la textura
 	glGenTextures(1, &txs_gameplay_efecto_defensa);					  // Creando el id de la textura del landingpad
 	glBindTexture(GL_TEXTURE_2D, txs_gameplay_efecto_defensa);		  // Se enlaza la textura
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	  // Wrapping en el eje u
@@ -1021,9 +1031,9 @@ void init(int width, int height, std::string strTitle, bool bFullScreen)
 
 	// Definiendo la textura
 	Texture texture_efecto_03("../media/textures_screen/efecto_velocidad.PNG");
-	texture_efecto_03.loadImage();										  // Cargar la textura
-	glGenTextures(1, &txs_gameplay_efecto_velocidad);					  // Creando el id de la textura del landingpad
-	glBindTexture(GL_TEXTURE_2D, txs_gameplay_efecto_velocidad);		  // Se enlaza la textura
+	texture_efecto_03.loadImage();									  // Cargar la textura
+	glGenTextures(1, &txs_gameplay_efecto_velocidad);				  // Creando el id de la textura del landingpad
+	glBindTexture(GL_TEXTURE_2D, txs_gameplay_efecto_velocidad);	  // Se enlaza la textura
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	  // Wrapping en el eje u
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);	  // Wrapping en el eje v
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // Filtering de minimización
@@ -1160,7 +1170,7 @@ void destroy()
 	rayModel.destroy();
 	boxIntro.destroy();
 	boxViewDepth.destroy();
-	//models
+	// models
 	ModelCazador.destroy();
 	ModelSanador.destroy();
 	ModelCaballero.destroy();
@@ -1169,7 +1179,6 @@ void destroy()
 	ModelDemonio.destroy();
 	ModelHechicero.destroy();
 	ModelAnfiteres.destroy();
-
 
 	// Custom objects Delete
 	modelFountain.destroy();
@@ -1309,7 +1318,8 @@ bool processInput(bool continueApplication)
 				txs_active = txs_main_title01;
 				alSourcePlay(al_sources[1]);
 			}
-			else if (ena_key_enter && glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS) {
+			else if (ena_key_enter && glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS)
+			{
 				std::cout << "JUEGO CERRADO" << std::endl;
 				exit(0);
 			}
@@ -1342,7 +1352,7 @@ bool processInput(bool continueApplication)
 			camera1P->moveRightCamera(false, deltaTime * 2);
 		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 			camera1P->moveRightCamera(true, deltaTime * 2);
-		
+
 		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
 			camera1P->mouseMoveCamera(offsetX, offsetY, deltaTime * 2);
 	}
@@ -1363,15 +1373,15 @@ bool processInput(bool continueApplication)
 	{
 		cursor_y += 0.001;
 	}
-		else if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-		{
-			cursor_y -= 0.001;
+	else if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+	{
+		cursor_y -= 0.001;
 	}
 	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
 	{
 		cursor_x -= 0.001;
 	}
-		else if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+	else if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
 	{
 		cursor_x += 0.001;
 	}
@@ -1419,170 +1429,192 @@ bool processInput(bool continueApplication)
 	if (enableCountSelected && glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS)
 	{
 		enableCountSelected = false;
-		CazadorSelected=true;
-		SanadorSelected=true;
-		CaballeroSelected=true;
-		VengadorSelected=true;
+		CazadorSelected = true;
+		SanadorSelected = true;
+		CaballeroSelected = true;
+		VengadorSelected = true;
 		modelSelected++;
 		if (modelSelected > 4)
-			modelSelected = 0;
+			modelSelected = 1;
 
 		std::cout << "modelSelected:" << modelSelected << std::endl;
 	}
+	else if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_RELEASE)
+		enableCountSelected = true;
 	//--------------------------------------------------------
-	if(modelSelected == 1)
+	if (modelSelected == 1)
 	{
-		//tirada de salvacion antes de realizar su acciones
-		if(CazadorSelected && Cazador.vida>0){
+		// tirada de salvacion antes de realizar su acciones
+		if (CazadorSelected && Cazador.vida > 0)
+		{
 
-		
+			if (CazadorSelected && glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+			{ // tira el dado y avanza
+				CazadorSelected = false;
 
-		if(CazadorSelected && glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS){//tira el dado y avanza 	
-			CazadorSelected=false;
-			
-			int dado = 1+rand()%5;
-			printf("Entro a accion 1 del cazador y el dado dio %d\n", dado);
+				int dado = 1 + rand() % 5;
+				printf("Entro a accion 1 del cazador y el dado dio %d\n", dado);
 
-			GeneradorMs=MostruosGenerdor(GeneradorMs);
+				GeneradorMs = MostruosGenerdor(GeneradorMs);
 
-			Tablero(&Cazador,dado,&GeneradorMs,&Anfiteres);
+				Tablero(&Cazador, dado, &GeneradorMs, &Anfiteres);
 
-			printf("Entro a accion 1 del cazador y su ataque es %d\n", Cazador.ataque);
-			printf("Entro a accion 1 del cazador y su defensa es %d\n", Cazador.defensa);
-			printf("Entro a accion 1 del cazador y su vida es %d\n", Cazador.vida);
-			printf("Entro a accion 1 del cazador y su poss es %d\n", Cazador.PossTablero);
+				printf("Entro a accion 1 del cazador y su ataque es %d\n", Cazador.ataque);
+				printf("Entro a accion 1 del cazador y su defensa es %d\n", Cazador.defensa);
+				printf("Entro a accion 1 del cazador y su vida es %d\n", Cazador.vida);
+				printf("Entro a accion 1 del cazador y su poss es %d\n", Cazador.PossTablero);
 
-			printf("Entro a accion Ms vida %d\n", GeneradorMs.vida);
-			
-		}if(CazadorSelected && glfwGetKey(window, GLFW_KEY_2)== GLFW_PRESS){//diplica su dañao y avanza 
-			
-			CazadorSelected=false;
-			
-			Cazador.ataque=Cazador.ataque*2;
-			int dado = 1+rand()%5;
-			printf("Entro a accion 2 del cazador y el dado dio %d\n", dado);
-			printf("Entro a accion 2 del cazador y su ataque es %d\n", Cazador.ataque);
-			GeneradorMs=MostruosGenerdor(GeneradorMs);
-			Tablero(&Cazador,dado,&GeneradorMs,&Anfiteres);
-			Cazador.ataque=Cazador.ataque/2;
-			printf("Entro a accion 2 del cazador y su ataque es %d\n", Cazador.ataque);
-			printf("Entro a accion 2 del cazador y su defensa es %d\n", Cazador.defensa);
-			printf("Entro a accion 2 del cazador y su vida es %d\n", Cazador.vida);
-			printf("Entro a accion 2 del cazador y su poss es %d\n", Cazador.PossTablero);
-			printf("Entro a accion Ms vida %d\n", GeneradorMs.vida);
-		}
-		/*if(!CazadorSelected && glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS){
-			CazadorSelected=true;
-			modelSelected = 2;
-			}*/		  
-	}if(CazadorSelected && Cazador.vida<=0){
-		Cazador=TiradaDeSalvacion(Cazador);
-		printf("Cazador Muerto y Su tirada de Salvacion fallo");
-	}
-	}
-
-	if(modelSelected == 2)
-	{
-		
-		//tirada de salvacion antes de realizar su acciones
-		
-		if(SanadorSelected && Sanador.vida>0){
-
-		if(SanadorSelected && glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS){//tira el dado y avanza 	
-			SanadorSelected = false;
-			int dado = 1+rand()%5;
-			GeneradorMs=MostruosGenerdor(GeneradorMs);
-			Tablero(&Sanador,dado,&GeneradorMs,&Anfiteres);
-
-			printf("Entro a accion 1 del sanador y su ataque es %d\n", Sanador.ataque);
-			printf("Entro a accion 1 del sanador y su defensa es %d\n", Sanador.defensa);
-			printf("Entro a accion 1 del sanador y su vida es %d\n", Sanador.vida);
-			printf("Entro a accion 1 del sanador y su poss es %d\n", Sanador.PossTablero);
-
-			printf("Entro a accion Ms vida %d\n", GeneradorMs.vida);
-			
-		}if(SanadorSelected && glfwGetKey(window, GLFW_KEY_4)== GLFW_PRESS){//diplica su dañao y avanza 
-			SanadorSelected = false;
-			
-			if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS){
-				Cazador.vida=Cazador.vida + 2;
-			}if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS){
-				Caballero.vida=Caballero.vida + 2;
-			}if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS){
-				Vengador.vida=Vengador.vida + 2;
+				printf("Entro a accion Ms vida %d\n", GeneradorMs.vida);
 			}
-			int dado=1+rand()%5;
-			GeneradorMs=MostruosGenerdor(GeneradorMs);
-			Tablero(&Sanador,dado,&GeneradorMs,&Anfiteres);
-			printf("Entro a accion 2 del sanador y su ataque es %d\n", Sanador.ataque);
-			printf("Entro a accion 2 del sanador y su defensa es %d\n", Sanador.defensa);
-			printf("Entro a accion 2 del sanador y su vida es %d\n", Sanador.vida);
-			printf("Entro a accion 2 del sanador y su poss es %d\n", Sanador.PossTablero);
+			if (CazadorSelected && glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+			{ // diplica su dañao y avanza
 
-			printf("Entro a accion Ms vida %d\n", GeneradorMs.vida);
+				CazadorSelected = false;
+
+				Cazador.ataque = Cazador.ataque * 2;
+				int dado = 1 + rand() % 5;
+				printf("Entro a accion 2 del cazador y el dado dio %d\n", dado);
+				printf("Entro a accion 2 del cazador y su ataque es %d\n", Cazador.ataque);
+				GeneradorMs = MostruosGenerdor(GeneradorMs);
+				Tablero(&Cazador, dado, &GeneradorMs, &Anfiteres);
+				Cazador.ataque = Cazador.ataque / 2;
+				printf("Entro a accion 2 del cazador y su ataque es %d\n", Cazador.ataque);
+				printf("Entro a accion 2 del cazador y su defensa es %d\n", Cazador.defensa);
+				printf("Entro a accion 2 del cazador y su vida es %d\n", Cazador.vida);
+				printf("Entro a accion 2 del cazador y su poss es %d\n", Cazador.PossTablero);
+				printf("Entro a accion Ms vida %d\n", GeneradorMs.vida);
+			}
+			/*if(!CazadorSelected && glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS){
+				CazadorSelected=true;
+				modelSelected = 2;
+				}*/
 		}
-		}if(SanadorSelected && Sanador.vida<=0){
-		Sanador=TiradaDeSalvacion(Sanador);
-		printf("sanador Muerto y Su tirada de Salvacion fallo");
-	}
-	}
-	if(modelSelected == 3 )
-	{
-		if(CaballeroSelected && Caballero.vida>0){
-
-		if(CaballeroSelected && glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS){//tira el dado y avanza 
-			CaballeroSelected=false;
-			int dado=1+rand()%5;
-			GeneradorMs=MostruosGenerdor(GeneradorMs);
-			Tablero(&Caballero,dado,&GeneradorMs,&Anfiteres);
-
-			printf("Entro a accion 1 del caballero y su ataque es %d\n", Caballero.ataque);
-			printf("Entro a accion 1 del caballero y su defensa es %d\n", Caballero.defensa);
-			printf("Entro a accion 1 del caballero y su vida es %d\n", Caballero.vida);
-			printf("Entro a accion 1 del caballero y su poss es %d\n", Caballero.PossTablero);
-
-			printf("Entro a accion Ms vida %d\n", GeneradorMs.vida);
-			
-		}if(CaballeroSelected && glfwGetKey(window, GLFW_KEY_6)== GLFW_PRESS){//diplica su dañao y avanza 
-			CaballeroSelected=false;
-			Caballero.defensa = Caballero.defensa+2;
-			int dado=1+rand()%5;
-			MostruosGenerdor(GeneradorMs);
-			Tablero(&Caballero,dado,&GeneradorMs,&Anfiteres);
-			Caballero.defensa = Caballero.defensa-2;
-			printf("Entro a accion 2 del caballero y su ataque es %d\n", Caballero.ataque);
-			printf("Entro a accion 2 del caballero y su defensa es %d\n", Caballero.defensa);
-			printf("Entro a accion 2 del caballero y su vida es %d\n", Caballero.vida);
-			printf("Entro a accion 2 del caballero y su poss es %d\n", Caballero.PossTablero);
-
-			printf("Entro a accion Ms vida %d\n", GeneradorMs.vida);
+		if (CazadorSelected && Cazador.vida <= 0)
+		{
+			Cazador = TiradaDeSalvacion(Cazador);
+			printf("Cazador Muerto y Su tirada de Salvacion fallo");
 		}
-		}if(CaballeroSelected && Caballero.vida<=0){
-		Caballero=TiradaDeSalvacion(Caballero);
-		printf("Caballero Muerto y Su tirada de Salvacion fallo");
-	}	
-		
 	}
 
-	if(modelSelected == 4)
+	if (modelSelected == 2)
 	{
-		if(VengadorSelected && glfwGetKey(window, GLFW_KEY_7) == GLFW_PRESS){//tira el dado y avanza 
-			VengadorSelected= false;
-			int dado=1+rand()%5;
+
+		// tirada de salvacion antes de realizar su acciones
+
+		if (SanadorSelected && Sanador.vida > 0)
+		{
+
+			if (SanadorSelected && glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
+			{ // tira el dado y avanza
+				SanadorSelected = false;
+				int dado = 1 + rand() % 5;
+				GeneradorMs = MostruosGenerdor(GeneradorMs);
+				Tablero(&Sanador, dado, &GeneradorMs, &Anfiteres);
+
+				printf("Entro a accion 1 del sanador y su ataque es %d\n", Sanador.ataque);
+				printf("Entro a accion 1 del sanador y su defensa es %d\n", Sanador.defensa);
+				printf("Entro a accion 1 del sanador y su vida es %d\n", Sanador.vida);
+				printf("Entro a accion 1 del sanador y su poss es %d\n", Sanador.PossTablero);
+
+				printf("Entro a accion Ms vida %d\n", GeneradorMs.vida);
+			}
+			if (SanadorSelected && glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
+			{ // diplica su dañao y avanza
+				SanadorSelected = false;
+
+				if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
+				{
+					Cazador.vida = Cazador.vida + 2;
+				}
+				if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
+				{
+					Caballero.vida = Caballero.vida + 2;
+				}
+				if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS)
+				{
+					Vengador.vida = Vengador.vida + 2;
+				}
+				int dado = 1 + rand() % 5;
+				GeneradorMs = MostruosGenerdor(GeneradorMs);
+				Tablero(&Sanador, dado, &GeneradorMs, &Anfiteres);
+				printf("Entro a accion 2 del sanador y su ataque es %d\n", Sanador.ataque);
+				printf("Entro a accion 2 del sanador y su defensa es %d\n", Sanador.defensa);
+				printf("Entro a accion 2 del sanador y su vida es %d\n", Sanador.vida);
+				printf("Entro a accion 2 del sanador y su poss es %d\n", Sanador.PossTablero);
+
+				printf("Entro a accion Ms vida %d\n", GeneradorMs.vida);
+			}
+		}
+		if (SanadorSelected && Sanador.vida <= 0)
+		{
+			Sanador = TiradaDeSalvacion(Sanador);
+			printf("sanador Muerto y Su tirada de Salvacion fallo");
+		}
+	}
+	if (modelSelected == 3)
+	{
+		if (CaballeroSelected && Caballero.vida > 0)
+		{
+
+			if (CaballeroSelected && glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS)
+			{ // tira el dado y avanza
+				CaballeroSelected = false;
+				int dado = 1 + rand() % 5;
+				GeneradorMs = MostruosGenerdor(GeneradorMs);
+				Tablero(&Caballero, dado, &GeneradorMs, &Anfiteres);
+
+				printf("Entro a accion 1 del caballero y su ataque es %d\n", Caballero.ataque);
+				printf("Entro a accion 1 del caballero y su defensa es %d\n", Caballero.defensa);
+				printf("Entro a accion 1 del caballero y su vida es %d\n", Caballero.vida);
+				printf("Entro a accion 1 del caballero y su poss es %d\n", Caballero.PossTablero);
+
+				printf("Entro a accion Ms vida %d\n", GeneradorMs.vida);
+			}
+			if (CaballeroSelected && glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS)
+			{ // diplica su dañao y avanza
+				CaballeroSelected = false;
+				Caballero.defensa = Caballero.defensa + 2;
+				int dado = 1 + rand() % 5;
+				MostruosGenerdor(GeneradorMs);
+				Tablero(&Caballero, dado, &GeneradorMs, &Anfiteres);
+				Caballero.defensa = Caballero.defensa - 2;
+				printf("Entro a accion 2 del caballero y su ataque es %d\n", Caballero.ataque);
+				printf("Entro a accion 2 del caballero y su defensa es %d\n", Caballero.defensa);
+				printf("Entro a accion 2 del caballero y su vida es %d\n", Caballero.vida);
+				printf("Entro a accion 2 del caballero y su poss es %d\n", Caballero.PossTablero);
+
+				printf("Entro a accion Ms vida %d\n", GeneradorMs.vida);
+			}
+		}
+		if (CaballeroSelected && Caballero.vida <= 0)
+		{
+			Caballero = TiradaDeSalvacion(Caballero);
+			printf("Caballero Muerto y Su tirada de Salvacion fallo");
+		}
+	}
+
+	if (modelSelected == 4)
+	{
+		if (VengadorSelected && glfwGetKey(window, GLFW_KEY_7) == GLFW_PRESS)
+		{ // tira el dado y avanza
+			VengadorSelected = false;
+			int dado = 1 + rand() % 5;
 			MostruosGenerdor(GeneradorMs);
-			Tablero(&Vengador,dado,&GeneradorMs,&Anfiteres);
+			Tablero(&Vengador, dado, &GeneradorMs, &Anfiteres);
 			printf("Entro a accion 1 del vengador y su ataque es %d\n", Vengador.ataque);
 			printf("Entro a accion 1 del vengador y su defensa es %d\n", Vengador.defensa);
 			printf("Entro a accion 1 del vengador y su vida es %d\n", Vengador.vida);
 			printf("Entro a accion 1 del vengador y su poss es %d\n", Vengador.PossTablero);
 
 			printf("Entro a accion Ms vida %d\n", GeneradorMs.vida);
-		}if(VengadorSelected && glfwGetKey(window, GLFW_KEY_8)== GLFW_PRESS){//diplica su dañao y avanza .
-			VengadorSelected= false;
-			Vengador.ataque=Vengador.ataque+(10-Vengador.vida);
-			int dado=1+rand()%5;
+		}
+		if (VengadorSelected && glfwGetKey(window, GLFW_KEY_8) == GLFW_PRESS)
+		{ // diplica su dañao y avanza .
+			VengadorSelected = false;
+			Vengador.ataque = Vengador.ataque + (10 - Vengador.vida);
+			int dado = 1 + rand() % 5;
 			MostruosGenerdor(GeneradorMs);
-			Tablero(&Vengador,dado,&GeneradorMs,&Anfiteres);
+			Tablero(&Vengador, dado, &GeneradorMs, &Anfiteres);
 			modelSelected = 1;
 			printf("Entro a accion 2 del vengador y su ataque es %d\n", Vengador.ataque);
 			printf("Entro a accion 2 del vengador y su defensa es %d\n", Vengador.defensa);
@@ -1591,17 +1623,15 @@ bool processInput(bool continueApplication)
 
 			printf("Entro a accion Ms vida %d\n", GeneradorMs.vida);
 		}
-		if(VengadorSelected && Vengador.vida<=0){
-		Vengador=TiradaDeSalvacion(Vengador);
-		printf("Vengador Muerto y Su tirada de Salvacion fallo");
-	}	
-		
-	
+		if (VengadorSelected && Vengador.vida <= 0)
+		{
+			Vengador = TiradaDeSalvacion(Vengador);
+			printf("Vengador Muerto y Su tirada de Salvacion fallo");
+		}
 	}
 	//--------------------------------------------------------
+
 	
-	else if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_RELEASE)
-		enableCountSelected = true;
 
 	bool keySpaceStatus = glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS;
 	if (!isJump && keySpaceStatus)
@@ -1655,10 +1685,10 @@ void renderSolidScene()
 	glBindTexture(GL_TEXTURE_2D, textureTerrainBlendMapID);
 	shaderTerrain.setInt("blendMapTexture", 4);
 	shaderTerrain.setVectorFloat2("scaleUV", glm::value_ptr(glm::vec2(80, 80)));
-	
+
 	terrain.setPosition(glm::vec3(100, 0, 100));
 	terrain.render();
-	
+
 	shaderTerrain.setVectorFloat2("scaleUV", glm::value_ptr(glm::vec2(0, 0)));
 	glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -1673,28 +1703,26 @@ void renderSolidScene()
 	modelFountain.render(modelMatrixFountainCopy);
 	glEnable(GL_CULL_FACE);
 
-
-	//Models Huesos
+	// Models Huesos
 	glm::mat4 renderMatrixCazador = glm::mat4(ModelMatrixCazador);
-		renderMatrixCazador = glm::scale(renderMatrixCazador, glm::vec3(0.02f, 0.02f, 0.02f));
-		ModelCazador.setAnimationIndex(1);
-		ModelCazador.render(renderMatrixCazador);
+	renderMatrixCazador = glm::scale(renderMatrixCazador, glm::vec3(0.02f, 0.02f, 0.02f));
+	ModelCazador.setAnimationIndex(1);
+	ModelCazador.render(renderMatrixCazador);
 
 	glm::mat4 renderMatrixSanador = glm::mat4(ModelMatrixSanador);
-		renderMatrixSanador = glm::scale(renderMatrixSanador, glm::vec3(0.02f, 0.02f, 0.02f));
-		ModelSanador.setAnimationIndex(1);
-		ModelSanador.render(renderMatrixSanador);
+	renderMatrixSanador = glm::scale(renderMatrixSanador, glm::vec3(0.02f, 0.02f, 0.02f));
+	ModelSanador.setAnimationIndex(1);
+	ModelSanador.render(renderMatrixSanador);
 
 	glm::mat4 renderMatrixCaballero = glm::mat4(ModelMatrixCaballero);
-		renderMatrixCaballero = glm::scale(renderMatrixCaballero, glm::vec3(0.02f, 0.02f, 0.02f));
-		ModelCaballero.setAnimationIndex(1);
-		ModelCaballero.render(renderMatrixCaballero);
+	renderMatrixCaballero = glm::scale(renderMatrixCaballero, glm::vec3(0.02f, 0.02f, 0.02f));
+	ModelCaballero.setAnimationIndex(1);
+	ModelCaballero.render(renderMatrixCaballero);
 
 	glm::mat4 renderMatrixVengador = glm::mat4(ModelMatrixVengador);
-		renderMatrixVengador = glm::scale(renderMatrixVengador, glm::vec3(0.02f, 0.02f, 0.02f));
-		ModelVengador.setAnimationIndex(1);
-		ModelVengador.render(renderMatrixVengador);
-
+	renderMatrixVengador = glm::scale(renderMatrixVengador, glm::vec3(0.02f, 0.02f, 0.02f));
+	ModelVengador.setAnimationIndex(1);
+	ModelVengador.render(renderMatrixVengador);
 
 	/*******************************************
 	 * Skybox
@@ -1730,7 +1758,7 @@ void renderAlphaScene(bool render = true)
 		blendingSorted[distanceFromView] = std::make_pair(itblend->first, itblend->second);
 	}
 
-		// ****************************************************************
+	// ****************************************************************
 	// renderAlphaScene(): MODELOS TRANSPARENTES
 	// ****************************************************************
 	glEnable(GL_BLEND);
@@ -1798,7 +1826,7 @@ void applicationLoop()
 	glm::vec3 axis;
 	glm::vec3 target;
 	float angleTarget;
-	
+
 	int state = 0;
 	float advanceCount = 0.0;
 	float rotCount = 0.0;
@@ -1810,14 +1838,13 @@ void applicationLoop()
 	// ****************************************************************
 	modelMatrixFountain = glm::translate(modelMatrixFountain, glm::vec3(5.0, 0.0, -40.0));
 
-	ModelMatrixCazador = glm::translate(ModelMatrixCazador,glm::vec3(10.0 , 0.0 , -50.0));
+	ModelMatrixCazador = glm::translate(ModelMatrixCazador, glm::vec3(10.0, 0.0, -50.0));
 
-	ModelMatrixSanador = glm::translate(ModelMatrixSanador,glm::vec3(15.0 , 0.0 , -50.0));
+	ModelMatrixSanador = glm::translate(ModelMatrixSanador, glm::vec3(15.0, 0.0, -50.0));
 
-	ModelMatrixCaballero = glm::translate(ModelMatrixCaballero,glm::vec3(20.0 , 0.0 , -50.0));
+	ModelMatrixCaballero = glm::translate(ModelMatrixCaballero, glm::vec3(20.0, 0.0, -50.0));
 
-	ModelMatrixVengador = glm::translate(ModelMatrixVengador,glm::vec3(25.0 , 0.0 , -50.0));
-
+	ModelMatrixVengador = glm::translate(ModelMatrixVengador, glm::vec3(25.0, 0.0, -50.0));
 
 	// Variables to interpolation key frames
 	// ***
@@ -1830,7 +1857,7 @@ void applicationLoop()
 
 	shadowBox = new ShadowBox(-lightPos, camera1P.get(), 15.0f, 0.1f, 45.0f);
 
-std::cout << "BEFORE PSI" << std::endl;
+	std::cout << "BEFORE PSI" << std::endl;
 	while (psi)
 	{
 		currTime = TimeManager::Instance().GetTime();
@@ -2007,7 +2034,7 @@ std::cout << "BEFORE PSI" << std::endl;
 			shaderTerrain.setFloat("pointLights[" + std::to_string(lamp1Position.size() + i) + "].linear", 0.09);
 			shaderTerrain.setFloat("pointLights[" + std::to_string(lamp1Position.size() + i) + "].quadratic", 0.02);
 		}
-			
+
 		// OpenAL
 
 		// Set up the listener
@@ -2024,7 +2051,7 @@ std::cout << "BEFORE PSI" << std::endl;
 		// ****************************************************************
 		if (!iniciaPartida)
 		{
-if (al_music_play[0])
+			if (al_music_play[0])
 			{
 				al_music_play[0] = false;
 				alSourcePlay(al_sources[0]);
@@ -2039,13 +2066,13 @@ if (al_music_play[0])
 			glfwSwapBuffers(window);
 			continue;
 		}
-else if (!en_pantalla_de_juego)
+		else if (!en_pantalla_de_juego)
 		{
 			en_pantalla_de_juego = true;
 			alDeleteSources(1, al_sources);
 		}
 
-// std::cout << "GAME STARTED" << std::endl;
+		// std::cout << "GAME STARTED" << std::endl;
 		/*******************************************
 		 * 1.- We render the depth buffer
 		 *******************************************/
