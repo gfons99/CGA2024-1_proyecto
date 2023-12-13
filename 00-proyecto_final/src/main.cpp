@@ -1240,6 +1240,10 @@ bool processInput(bool continueApplication)
 				txs_active = txs_main_title01;
 				alSourcePlay(al_sources[1]);
 			}
+			else if (ena_key_enter && glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS) {
+				std::cout << "JUEGO CERRADO" << std::endl;
+				exit(0);
+			}
 		}
 
 		if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_RELEASE)
