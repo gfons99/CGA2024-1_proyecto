@@ -104,10 +104,7 @@ float distanceFromTarget = 7.0;
 // MODELOS BÁSICOS
 // ****************************************************************
 Sphere skyboxSphere(20, 20);
-Box boxCesped;
-Box boxWalls;
-Box boxHighway;
-Box boxLandingPad;
+Box box_tablero;
 Sphere esfera1(10, 10);
 Box boxCollider;
 Sphere sphereCollider(10, 10);
@@ -140,7 +137,8 @@ ShadowBox *shadowBox;
 // ****************************************************************
 // TEXTURAS
 // ****************************************************************
-GLuint textureCespedID, textureWallID, textureWindowID, textureHighwayID, textureLandingPadID;
+GLuint textureCespedID;
+GLuint texture_tableroID;
 GLuint textureTerrainRID, textureTerrainGID, textureTerrainBID, textureTerrainBlendMapID;
 GLuint skyboxTextureID;
 GLuint txs_active;
@@ -152,6 +150,7 @@ GLuint textureParticleFountainID;
 bool iniciaPartida = false, presionarOpcion = false;
 bool en_pantalla_de_juego = false;
 bool ena_key_enter = true, ena_key_left = true, ena_key_right = true;
+bool ena_key_z = true, ena_key_x = true, ena_key_c = true;
 
 // Modelo para el render del texto
 FontTypeRendering::FontTypeRendering *modelText;
@@ -207,8 +206,6 @@ bool CazadorSelected = true;
 bool SanadorSelected = true;
 bool CaballeroSelected = true;
 bool VengadorSelected = true;
-
-int possActual = 0;
 // ****************************************************************
 // KEYFRAMES
 // ****************************************************************
@@ -436,9 +433,11 @@ Personaje TiradaDeSalvacion(Personaje Pj)
 	int DadoSalvacion = 1 + rand() % 6;
 	if (Pj.TiradaSalvacion <= DadoSalvacion)
 	{
-		Pj = inicializarPersonaje(Pj.TipoPj);
+		Pj.vida = Pj.vidaMx;
 		printf("Tirada de salvacion exitosa\n");
-	}else {
+	}
+	else
+	{
 		printf("Pj Muerto y Su tirada de Salvacion fallo");
 	}
 	return Pj;
@@ -561,15 +560,11 @@ int keyTablero(int TC)
 void Tablero(Personaje *Pj, int dado, Monstruo *Ms, Monstruo *Anfiteres, int Tipo_Casilla)
 {
 	printf("Entraste al tablero.\n");
-	if(Pj->CD < Pj->CDMX ){
+	if (Pj->CD < Pj->CDMX)
+	{
 		Pj->CD = Pj->CD + 1;
 	}
-	Pj->PossTablero = Pj->movimiento + dado;
-
-	if (Pj->PossTablero >= 27)
-	{
-		Pj->PossTablero = 0;
-	}
+	Pj->PossTablero += Pj->movimiento + dado;
 
 	buffo = 1 + rand() % 3;
 	switch (Tipo_Casilla)
@@ -583,6 +578,7 @@ void Tablero(Personaje *Pj, int dado, Monstruo *Ms, Monstruo *Anfiteres, int Tip
 		{
 			Pj->ataque += 2;
 			printf("Buffo 1\n");
+			// buffoBool
 		}
 		if (buffo == 2)
 		{
@@ -855,17 +851,8 @@ void init(int width, int height, std::string strTitle, bool bFullScreen)
 	rayModel.setShader(&shader);
 	rayModel.setColor(glm::vec4(1.0));
 
-	boxCesped.init();
-	boxCesped.setShader(&shaderMulLighting);
-
-	boxWalls.init();
-	boxWalls.setShader(&shaderMulLighting);
-
-	boxHighway.init();
-	boxHighway.setShader(&shaderMulLighting);
-
-	boxLandingPad.init();
-	boxLandingPad.setShader(&shaderMulLighting);
+	box_tablero.init();
+	box_tablero.setShader(&shaderMulLighting);
 
 	esfera1.init();
 	esfera1.setShader(&shaderMulLighting);
@@ -1143,6 +1130,30 @@ void init(int width, int height, std::string strTitle, bool bFullScreen)
 	textureScreen.freeImage(); // Liberamos memoria
 
 	// ****************************************************************
+	// init(): TABLERO
+	// ****************************************************************
+
+	// Definiendo la textura
+	Texture texture_tablero("../media/textures/tablero.png");
+	texture_tablero.loadImage();									  // Cargar la textura
+	glGenTextures(1, &texture_tableroID);							  // Creando el id de la textura del landingpad
+	glBindTexture(GL_TEXTURE_2D, texture_tableroID);				  // Se enlaza la textura
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	  // Wrapping en el eje u
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);	  // Wrapping en el eje v
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // Filtering de minimización
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // Filtering de maximimizacion
+	if (texture_tablero.getData())
+	{
+		// Transferir los datos de la imagen a la tarjeta
+		glTexImage2D(GL_TEXTURE_2D, 0, texture_tablero.getChannels() == 3 ? GL_RGB : GL_RGBA, texture_tablero.getWidth(), texture_tablero.getHeight(), 0,
+					 texture_tablero.getChannels() == 3 ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, texture_tablero.getData());
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+		std::cout << "Fallo la carga de textura" << std::endl;
+	texture_tablero.freeImage(); // Liberamos memoria
+
+	// ****************************************************************
 	// init(): EFECTOS
 	// ****************************************************************
 
@@ -1317,10 +1328,7 @@ void destroy()
 
 	// Basic objects Delete
 	skyboxSphere.destroy();
-	boxCesped.destroy();
-	boxWalls.destroy();
-	boxHighway.destroy();
-	boxLandingPad.destroy();
+	box_tablero.destroy();
 	esfera1.destroy();
 	boxCollider.destroy();
 	sphereCollider.destroy();
@@ -1346,10 +1354,7 @@ void destroy()
 	// Textures Delete
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glDeleteTextures(1, &textureCespedID);
-	glDeleteTextures(1, &textureWallID);
-	glDeleteTextures(1, &textureWindowID);
-	glDeleteTextures(1, &textureHighwayID);
-	glDeleteTextures(1, &textureLandingPadID);
+	glDeleteTextures(1, &texture_tableroID);
 	glDeleteTextures(1, &textureTerrainBID);
 	glDeleteTextures(1, &textureTerrainGID);
 	glDeleteTextures(1, &textureTerrainRID);
@@ -1524,6 +1529,35 @@ bool processInput(bool continueApplication)
 	offsetY = 0;
 
 	// ****************************************************************
+	// processInput(): EFECTOS
+	// ****************************************************************
+	if (ena_key_z && glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
+	{
+		txs_active = txs_gameplay_efecto_ataque;
+	}
+	else if (ena_key_x && glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
+	{
+		txs_active = txs_gameplay_efecto_defensa;
+	}
+	else if (ena_key_c && glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
+	{
+		txs_active = txs_gameplay_efecto_velocidad;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_RELEASE)
+	{
+		ena_key_z = true;
+	}
+	if (glfwGetKey(window, GLFW_KEY_X) == GLFW_RELEASE)
+	{
+		ena_key_x = true;
+	}
+	if (glfwGetKey(window, GLFW_KEY_C) == GLFW_RELEASE)
+	{
+		ena_key_c = true;
+	}
+
+	// ****************************************************************
 	// processInput(): FLECHAS
 	// ****************************************************************
 	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
@@ -1607,6 +1641,15 @@ bool processInput(bool continueApplication)
 		enableTirada = false;
 	}
 
+	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS && !enableTirada)
+	{
+		enableTirada = true;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_T) == GLFW_RELEASE && enableTirada)
+	{
+		enableTirada = false;
+	}
+
 	//--------------------------------------------------------
 	if (modelSelected == 1 && enableTirada)
 	{
@@ -1633,14 +1676,58 @@ bool processInput(bool continueApplication)
 					PerderBuffo(buffo, &Cazador);
 				}
 
-				ModelMatrixCazador = glm::translate(ModelMatrixCazador, glm::vec3(10.0 + Cazador.PossTablero, 0.0, -50.0));
+				if (Cazador.PossTablero < 7)
+				{
+					ModelMatrixCazador = glm::translate(ModelMatrixCazador, glm::vec3(0.0 - Cazador.PossTablero * 6.25, 0.0, 0.0));
+				}
+				else if (Cazador.PossTablero < 14)
+				{
+					ModelMatrixCazador = glm::translate(ModelMatrixCazador, glm::vec3(-6*6.5, 0.0, 0.0 - (Cazador.PossTablero - 6) * 6.25));
+				}
+				else if (Cazador.PossTablero < 21)
+				{
+					ModelMatrixCazador = glm::translate(ModelMatrixCazador, glm::vec3(0.0 + (Cazador.PossTablero - 13) * 6.25, 0.0,6*6.5));
+				}
+				else if (Cazador.PossTablero < 28)
+				{
+					ModelMatrixCazador = glm::translate(ModelMatrixCazador, glm::vec3(0.0, 0.0, 0.0 + (Cazador.PossTablero - 20) * 6.25));
+				}
+				else if (Cazador.PossTablero >= 28)
+				{
+					Cazador.PossTablero = 0;
+					ModelMatrixCazador = glm::translate(ModelMatrixCazador, glm::vec3(0.0, 0.0, 0.0));
+				}
+
+				/*if (Cazador.PossTablero < 7)
+				{
+					ModelMatrixCazador = glm::translate(ModelMatrixCazador, glm::vec3(0.0 - Cazador.PossTablero * 6.25, 0.0, 0.0));
+				}
+				else if (Cazador.PossTablero < 14)
+				{
+
+					ModelMatrixCazador = glm::translate(ModelMatrixCazador, glm::vec3((-6 * 6.25), 0.0, 0.0 - (Cazador.PossTablero - 6) * 6.25));
+				}
+				else if (Cazador.PossTablero < 21)
+				{
+
+					ModelMatrixCazador = glm::translate(ModelMatrixCazador, glm::vec3(0.0 + (Cazador.PossTablero - 13) * 6.25, 0.0, (-6 * 6.25)));
+				}
+				else if (Cazador.PossTablero < 28)
+				{
+					ModelMatrixCazador = glm::translate(ModelMatrixCazador, glm::vec3(0.0, 0.0, 0.0 + (Cazador.PossTablero - 20) * 6.25));
+				}
+				else if (Cazador.PossTablero > 28)
+				{
+					Cazador.PossTablero = 0;
+					ModelMatrixCazador = glm::translate(ModelMatrixCazador, glm::vec3(0.0, 0.0, 0.0));
+				}*/
 
 				printf("Entro a accion 1 del cazador y su ataque es %d\n", Cazador.ataque);
 				printf("Entro a accion 1 del cazador y su defensa es %d\n", Cazador.defensa);
 				printf("Entro a accion 1 del cazador y su vida es %d\n", Cazador.vida);
 				printf("Entro a accion 1 del cazador y su poss es %d\n", Cazador.PossTablero);
 
-				printf("Habilidad en CD Tira el Dado (Accion 1) CD %d / %d",Cazador.CD,Cazador.CDMX );
+				printf("Habilidad en CD Tira el Dado (Accion 1) CD %d / %d\n", Cazador.CD, Cazador.CDMX);
 			}
 
 			if (CazadorSelected && glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
@@ -1674,14 +1761,14 @@ bool processInput(bool continueApplication)
 				}
 				else
 				{
-					printf("Habilidad en CD Tira el Dado (Accion 1) CD %d / %d",Cazador.CD,Cazador.CDMX );
+					printf("Habilidad en CD Tira el Dado (Accion 1) CD %d / %d\n", Cazador.CD, Cazador.CDMX);
 				}
 			}
 		}
 		else if (CazadorSelected && Cazador.vida <= 0)
 		{
 			Cazador = TiradaDeSalvacion(Cazador);
-			
+
 			CazadorSelected = false;
 		}
 	}
@@ -1697,10 +1784,14 @@ bool processInput(bool continueApplication)
 			if (SanadorSelected && glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
 			{ // tira el dado y avanza
 				SanadorSelected = false;
-				int dado = 1 + rand() % 5;
+				int dado = 1 + rand() % 6;
 				GeneradorMs = MostruosGenerdor(GeneradorMs);
+				Tipo_Casilla = keyTablero(Sanador.movimiento + dado);
 				Tablero(&Sanador, dado, &GeneradorMs, &Anfiteres, Tipo_Casilla);
-
+				if (Tipo_Casilla == 1)
+				{
+					PerderBuffo(buffo, &Sanador);
+				}
 				printf("Entro a accion 1 del sanador y su ataque es %d\n", Sanador.ataque);
 				printf("Entro a accion 1 del sanador y su defensa es %d\n", Sanador.defensa);
 				printf("Entro a accion 1 del sanador y su vida es %d\n", Sanador.vida);
@@ -1709,36 +1800,42 @@ bool processInput(bool continueApplication)
 				printf("Entro a accion Ms vida %d\n", GeneradorMs.vida);
 			}
 			if (SanadorSelected && glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
-			{ // diplica su dañao y avanza
+			{
 				SanadorSelected = false;
-
-				if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
+				if (Sanador.CD == Sanador.CDMX)
 				{
-					Cazador.vida = Cazador.vida + 2;
+					if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
+					{
+						Cazador.vida = Cazador.vida + 2;
+					}
+					if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
+					{
+						Caballero.vida = Caballero.vida + 2;
+					}
+					if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS)
+					{
+						Vengador.vida = Vengador.vida + 2;
+					}
+					int dado = 1 + rand() % 6;
+					GeneradorMs = MostruosGenerdor(GeneradorMs);
+					Tipo_Casilla = keyTablero(Sanador.movimiento + dado);
+					Tablero(&Sanador, dado, &GeneradorMs, &Anfiteres, Tipo_Casilla);
+					if (Tipo_Casilla == 1)
+					{
+						PerderBuffo(buffo, &Sanador);
+					}
+					printf("Entro a accion 2 del sanador y su ataque es %d\n", Sanador.ataque);
+					printf("Entro a accion 2 del sanador y su defensa es %d\n", Sanador.defensa);
+					printf("Entro a accion 2 del sanador y su vida es %d\n", Sanador.vida);
+					printf("Entro a accion 2 del sanador y su poss es %d\n", Sanador.PossTablero);
 				}
-				if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
-				{
-					Caballero.vida = Caballero.vida + 2;
-				}
-				if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS)
-				{
-					Vengador.vida = Vengador.vida + 2;
-				}
-				int dado = 1 + rand() % 5;
-				GeneradorMs = MostruosGenerdor(GeneradorMs);
-				Tablero(&Sanador, dado, &GeneradorMs, &Anfiteres, Tipo_Casilla);
-				printf("Entro a accion 2 del sanador y su ataque es %d\n", Sanador.ataque);
-				printf("Entro a accion 2 del sanador y su defensa es %d\n", Sanador.defensa);
-				printf("Entro a accion 2 del sanador y su vida es %d\n", Sanador.vida);
-				printf("Entro a accion 2 del sanador y su poss es %d\n", Sanador.PossTablero);
-
-				printf("Entro a accion Ms vida %d\n", GeneradorMs.vida);
+				else
+					printf("Habilidad en CD Tira el Dado (Accion 1) CD %d / %d\n", Sanador.CD, Sanador.CDMX);
 			}
 		}
 		if (SanadorSelected && Sanador.vida <= 0)
 		{
 			Sanador = TiradaDeSalvacion(Sanador);
-			printf("sanador Muerto y Su tirada de Salvacion fallo");
 		}
 	}
 	if (modelSelected == 3 && enableTirada)
@@ -1749,37 +1846,42 @@ bool processInput(bool continueApplication)
 			if (CaballeroSelected && glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS)
 			{ // tira el dado y avanza
 				CaballeroSelected = false;
-				int dado = 1 + rand() % 5;
+				int dado = 1 + rand() % 6;
 				GeneradorMs = MostruosGenerdor(GeneradorMs);
+				Tipo_Casilla = keyTablero(Caballero.movimiento + dado);
 				Tablero(&Caballero, dado, &GeneradorMs, &Anfiteres, Tipo_Casilla);
+				if (Tipo_Casilla == 1)
+				{
+					PerderBuffo(buffo, &Caballero);
+				}
 
 				printf("Entro a accion 1 del caballero y su ataque es %d\n", Caballero.ataque);
 				printf("Entro a accion 1 del caballero y su defensa es %d\n", Caballero.defensa);
 				printf("Entro a accion 1 del caballero y su vida es %d\n", Caballero.vida);
 				printf("Entro a accion 1 del caballero y su poss es %d\n", Caballero.PossTablero);
-
-				printf("Entro a accion Ms vida %d\n", GeneradorMs.vida);
 			}
 			if (CaballeroSelected && glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS)
 			{ // diplica su dañao y avanza
 				CaballeroSelected = false;
 				Caballero.defensa = Caballero.defensa + 2;
-				int dado = 1 + rand() % 5;
+				int dado = 1 + rand() % 6;
 				MostruosGenerdor(GeneradorMs);
+				Tipo_Casilla = keyTablero(Caballero.movimiento + dado);
 				Tablero(&Caballero, dado, &GeneradorMs, &Anfiteres, Tipo_Casilla);
+				if (Tipo_Casilla == 1)
+				{
+					PerderBuffo(buffo, &Caballero);
+				}
 				Caballero.defensa = Caballero.defensa - 2;
 				printf("Entro a accion 2 del caballero y su ataque es %d\n", Caballero.ataque);
 				printf("Entro a accion 2 del caballero y su defensa es %d\n", Caballero.defensa);
 				printf("Entro a accion 2 del caballero y su vida es %d\n", Caballero.vida);
 				printf("Entro a accion 2 del caballero y su poss es %d\n", Caballero.PossTablero);
-
-				printf("Entro a accion Ms vida %d\n", GeneradorMs.vida);
 			}
 		}
 		if (CaballeroSelected && Caballero.vida <= 0)
 		{
 			Caballero = TiradaDeSalvacion(Caballero);
-			printf("Caballero Muerto y Su tirada de Salvacion fallo");
 		}
 	}
 
@@ -1790,13 +1892,16 @@ bool processInput(bool continueApplication)
 			VengadorSelected = false;
 			int dado = 1 + rand() % 5;
 			MostruosGenerdor(GeneradorMs);
+			Tipo_Casilla = keyTablero(Vengador.movimiento + dado);
 			Tablero(&Vengador, dado, &GeneradorMs, &Anfiteres, Tipo_Casilla);
+			if (Tipo_Casilla == 1)
+			{
+				PerderBuffo(buffo, &Vengador);
+			}
 			printf("Entro a accion 1 del vengador y su ataque es %d\n", Vengador.ataque);
 			printf("Entro a accion 1 del vengador y su defensa es %d\n", Vengador.defensa);
 			printf("Entro a accion 1 del vengador y su vida es %d\n", Vengador.vida);
 			printf("Entro a accion 1 del vengador y su poss es %d\n", Vengador.PossTablero);
-
-			printf("Entro a accion Ms vida %d\n", GeneradorMs.vida);
 		}
 		if (VengadorSelected && glfwGetKey(window, GLFW_KEY_8) == GLFW_PRESS)
 		{ // diplica su dañao y avanza .
@@ -1804,19 +1909,20 @@ bool processInput(bool continueApplication)
 			Vengador.ataque = Vengador.ataque + (10 - Vengador.vida);
 			int dado = 1 + rand() % 5;
 			MostruosGenerdor(GeneradorMs);
+			Tipo_Casilla = keyTablero(Vengador.movimiento + dado);
 			Tablero(&Vengador, dado, &GeneradorMs, &Anfiteres, Tipo_Casilla);
-			modelSelected = 1;
+			if (Tipo_Casilla == 1)
+			{
+				PerderBuffo(buffo, &Vengador);
+			}
 			printf("Entro a accion 2 del vengador y su ataque es %d\n", Vengador.ataque);
 			printf("Entro a accion 2 del vengador y su defensa es %d\n", Vengador.defensa);
 			printf("Entro a accion 2 del vengador y su vida es %d\n", Vengador.vida);
 			printf("Entro a accion 2 del vengador y su poss es %d\n", Vengador.PossTablero);
-
-			printf("Entro a accion Ms vida %d\n", GeneradorMs.vida);
 		}
 		if (VengadorSelected && Vengador.vida <= 0)
 		{
 			Vengador = TiradaDeSalvacion(Vengador);
-			printf("Vengador Muerto y Su tirada de Salvacion fallo");
 		}
 	}
 	//--------------------------------------------------------
@@ -1946,7 +2052,13 @@ void renderAlphaScene(bool render = true)
 	glDisable(GL_CULL_FACE);
 	for (std::map<float, std::pair<std::string, glm::vec3>>::reverse_iterator it = blendingSorted.rbegin(); it != blendingSorted.rend(); it++)
 	{
-		// *************
+		box_tablero.setScale(glm::vec3(50.0f, 0.05f, 50.0f));
+		box_tablero.setPosition(glm::vec3(0.0f, 2.0f, 0.0f));
+		box_tablero.setOrientation(glm::vec3(0.0f, 0.0f, 0.0f));
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texture_tableroID);
+		shaderMulLighting.setInt("texture1", 0);
+		box_tablero.render();
 	}
 	glEnable(GL_CULL_FACE);
 	glDisable(GL_BLEND);
@@ -2020,13 +2132,23 @@ void applicationLoop()
 	// ****************************************************************
 	modelMatrixFountain = glm::translate(modelMatrixFountain, glm::vec3(5.0, 0.0, -40.0));
 
-	ModelMatrixCazador = glm::translate(ModelMatrixCazador, glm::vec3(10.0, 0.0, -50.0));
+	// ModelMatrixCazador = glm::translate(ModelMatrixCazador, glm::vec3(10.0, 0.0, -50.0));
 
-	ModelMatrixSanador = glm::translate(ModelMatrixSanador, glm::vec3(15.0, 0.0, -50.0));
+	// ModelMatrixSanador = glm::translate(ModelMatrixSanador, glm::vec3(15.0, 0.0, -50.0));
 
-	ModelMatrixCaballero = glm::translate(ModelMatrixCaballero, glm::vec3(20.0, 0.0, -50.0));
+	// ModelMatrixCaballero = glm::translate(ModelMatrixCaballero, glm::vec3(20.0, 0.0, -50.0));
+	// X = (160/512) * 50 = 15.625
+	// Y = (224/512) * 50 = 21.875
+	// 6.25
+	// 224, 226
 
-	ModelMatrixVengador = glm::translate(ModelMatrixVengador, glm::vec3(25.0, 0.0, -50.0));
+	ModelMatrixVengador = glm::translate(ModelMatrixVengador, glm::vec3(16.625, 0.0, 23.565));
+
+	ModelMatrixCaballero = glm::translate(ModelMatrixCaballero, glm::vec3(14.625, 0.0, 23.565));
+
+	ModelMatrixCazador = glm::translate(ModelMatrixCazador, glm::vec3(16.625, 0.0, 20.885));
+
+	ModelMatrixSanador = glm::translate(ModelMatrixSanador, glm::vec3(14.625, 0.0, 20.885));
 
 	// Variables to interpolation key frames
 	// ***
