@@ -104,10 +104,7 @@ float distanceFromTarget = 7.0;
 // MODELOS BÁSICOS
 // ****************************************************************
 Sphere skyboxSphere(20, 20);
-Box boxCesped;
-Box boxWalls;
-Box boxHighway;
-Box boxLandingPad;
+Box box_tablero;
 Sphere esfera1(10, 10);
 Box boxCollider;
 Sphere sphereCollider(10, 10);
@@ -140,7 +137,8 @@ ShadowBox *shadowBox;
 // ****************************************************************
 // TEXTURAS
 // ****************************************************************
-GLuint textureCespedID, textureWallID, textureWindowID, textureHighwayID, textureLandingPadID;
+GLuint textureCespedID;
+GLuint texture_tableroID;
 GLuint textureTerrainRID, textureTerrainGID, textureTerrainBID, textureTerrainBlendMapID;
 GLuint skyboxTextureID;
 GLuint txs_active;
@@ -152,6 +150,7 @@ GLuint textureParticleFountainID;
 bool iniciaPartida = false, presionarOpcion = false;
 bool en_pantalla_de_juego = false;
 bool ena_key_enter = true, ena_key_left = true, ena_key_right = true;
+bool ena_key_z = true, ena_key_x = true, ena_key_c = true;
 
 // Modelo para el render del texto
 FontTypeRendering::FontTypeRendering *modelText;
@@ -708,17 +707,8 @@ void init(int width, int height, std::string strTitle, bool bFullScreen)
 	rayModel.setShader(&shader);
 	rayModel.setColor(glm::vec4(1.0));
 
-	boxCesped.init();
-	boxCesped.setShader(&shaderMulLighting);
-
-	boxWalls.init();
-	boxWalls.setShader(&shaderMulLighting);
-
-	boxHighway.init();
-	boxHighway.setShader(&shaderMulLighting);
-
-	boxLandingPad.init();
-	boxLandingPad.setShader(&shaderMulLighting);
+	box_tablero.init();
+	box_tablero.setShader(&shaderMulLighting);
 
 	esfera1.init();
 	esfera1.setShader(&shaderMulLighting);
@@ -996,6 +986,30 @@ void init(int width, int height, std::string strTitle, bool bFullScreen)
 	textureScreen.freeImage(); // Liberamos memoria
 
 	// ****************************************************************
+	// init(): TABLERO
+	// ****************************************************************
+
+	// Definiendo la textura
+	Texture texture_tablero("../media/textures/tablero.png");
+	texture_tablero.loadImage();									  // Cargar la textura
+	glGenTextures(1, &texture_tableroID);					  // Creando el id de la textura del landingpad
+	glBindTexture(GL_TEXTURE_2D, texture_tableroID);		  // Se enlaza la textura
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	  // Wrapping en el eje u
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);	  // Wrapping en el eje v
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // Filtering de minimización
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // Filtering de maximimizacion
+	if (texture_tablero.getData())
+	{
+		// Transferir los datos de la imagen a la tarjeta
+		glTexImage2D(GL_TEXTURE_2D, 0, texture_tablero.getChannels() == 3 ? GL_RGB : GL_RGBA, texture_tablero.getWidth(), texture_tablero.getHeight(), 0,
+					 texture_tablero.getChannels() == 3 ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, texture_tablero.getData());
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+		std::cout << "Fallo la carga de textura" << std::endl;
+	texture_tablero.freeImage(); // Liberamos memoria
+
+	// ****************************************************************
 	// init(): EFECTOS
 	// ****************************************************************
 
@@ -1170,10 +1184,7 @@ void destroy()
 
 	// Basic objects Delete
 	skyboxSphere.destroy();
-	boxCesped.destroy();
-	boxWalls.destroy();
-	boxHighway.destroy();
-	boxLandingPad.destroy();
+	box_tablero.destroy();
 	esfera1.destroy();
 	boxCollider.destroy();
 	sphereCollider.destroy();
@@ -1199,10 +1210,7 @@ void destroy()
 	// Textures Delete
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glDeleteTextures(1, &textureCespedID);
-	glDeleteTextures(1, &textureWallID);
-	glDeleteTextures(1, &textureWindowID);
-	glDeleteTextures(1, &textureHighwayID);
-	glDeleteTextures(1, &textureLandingPadID);
+	glDeleteTextures(1, &texture_tableroID);
 	glDeleteTextures(1, &textureTerrainBID);
 	glDeleteTextures(1, &textureTerrainGID);
 	glDeleteTextures(1, &textureTerrainRID);
@@ -1377,6 +1385,35 @@ bool processInput(bool continueApplication)
 	offsetY = 0;
 
 	// ****************************************************************
+	// processInput(): EFECTOS
+	// ****************************************************************
+	if (ena_key_z && glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
+	{
+		txs_active = txs_gameplay_efecto_ataque;
+	}
+	else if (ena_key_x && glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
+	{
+		txs_active = txs_gameplay_efecto_defensa;
+	}
+	else if (ena_key_c && glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
+	{
+		txs_active = txs_gameplay_efecto_velocidad;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_RELEASE)
+	{
+		ena_key_z = true;
+	}
+	if (glfwGetKey(window, GLFW_KEY_X) == GLFW_RELEASE)
+	{
+		ena_key_x = true;
+	}
+	if (glfwGetKey(window, GLFW_KEY_C) == GLFW_RELEASE)
+	{
+		ena_key_c = true;
+	}
+
+	// ****************************************************************
 	// processInput(): FLECHAS
 	// ****************************************************************
 	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
@@ -1451,14 +1488,15 @@ bool processInput(bool continueApplication)
 	}
 	else if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_RELEASE)
 		enableCountSelected = true;
-		if(glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS && !enableTirada){
-			enableTirada = true;
-		}else if(glfwGetKey(window, GLFW_KEY_T) == GLFW_RELEASE && enableTirada){
-			enableTirada = false;
+	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS && !enableTirada)
+	{
+		enableTirada = true;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_T) == GLFW_RELEASE && enableTirada)
+	{
+		enableTirada = false;
+	}
 
-		}
-		
-		
 	//--------------------------------------------------------
 	if (modelSelected == 1 && enableTirada)
 	{
@@ -1503,10 +1541,12 @@ bool processInput(bool continueApplication)
 				printf("Entro a accion 2 del cazador y su poss es %d\n", Cazador.PossTablero);
 				printf("Entro a accion Ms vida %d\n", GeneradorMs.vida);
 			}
-		}else if (CazadorSelected && Cazador.vida <= 0){
+		}
+		else if (CazadorSelected && Cazador.vida <= 0)
+		{
 			Cazador = TiradaDeSalvacion(Cazador);
 			printf("Cazador Muerto y Su tirada de Salvacion fallo");
-			CazadorSelected= false;
+			CazadorSelected = false;
 		}
 	}
 
@@ -1770,7 +1810,13 @@ void renderAlphaScene(bool render = true)
 	glDisable(GL_CULL_FACE);
 	for (std::map<float, std::pair<std::string, glm::vec3>>::reverse_iterator it = blendingSorted.rbegin(); it != blendingSorted.rend(); it++)
 	{
-		// *************
+		box_tablero.setScale(glm::vec3(50.0f, 0.05f, 50.0f));
+		box_tablero.setPosition(glm::vec3(0.0f, 2.0f, 0.0f));
+		box_tablero.setOrientation(glm::vec3(0.0f, 0.0f, 0.0f));
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texture_tableroID);
+		shaderMulLighting.setInt("texture1", 0);
+		box_tablero.render();
 	}
 	glEnable(GL_CULL_FACE);
 	glDisable(GL_BLEND);
@@ -1848,7 +1894,12 @@ void applicationLoop()
 
 	ModelMatrixSanador = glm::translate(ModelMatrixSanador, glm::vec3(15.0, 0.0, -50.0));
 
-	ModelMatrixCaballero = glm::translate(ModelMatrixCaballero, glm::vec3(20.0, 0.0, -50.0));
+	// ModelMatrixCaballero = glm::translate(ModelMatrixCaballero, glm::vec3(20.0, 0.0, -50.0));
+	// X = (160/512) * 50 = 15.625
+	// Y = (224/512) * 50 = 21.875
+
+	// 224, 226
+	ModelMatrixCaballero = glm::translate(ModelMatrixCaballero, glm::vec3(15.625, 0.0, 21.875));
 
 	ModelMatrixVengador = glm::translate(ModelMatrixVengador, glm::vec3(25.0, 0.0, -50.0));
 
