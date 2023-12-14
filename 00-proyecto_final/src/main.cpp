@@ -88,8 +88,6 @@ Shader shaderTexture;
 Shader shaderDepth;
 // Shader para visualizar el buffer de profundidad
 Shader shaderViewDepth;
-// Shader para las particulas de fountain
-Shader shaderParticlesFountain;
 
 // ****************************************************************
 // CÁMARAS
@@ -114,8 +112,9 @@ Box boxViewDepth;
 // ****************************************************************
 // MODELOS (OBF, FBX)
 // ****************************************************************
-// Fountain
-Model modelFountain;
+
+// Decoración
+Model modelDecoBosque;
 
 // objetos PJ y MS
 Model ModelCazador;
@@ -137,7 +136,7 @@ ShadowBox *shadowBox;
 // ****************************************************************
 // TEXTURAS
 // ****************************************************************
-GLuint textureCespedID;
+GLuint textureTerrainKID;
 GLuint texture_tableroID;
 GLuint textureTerrainRID, textureTerrainGID, textureTerrainBID, textureTerrainBlendMapID;
 GLuint skyboxTextureID;
@@ -145,7 +144,6 @@ GLuint txs_active;
 GLuint txs_main_title01, txs_main_title02, txs_main_title03;
 GLuint txs_gameplay_ui_personajes;
 GLuint txs_gameplay_efecto_ataque, txs_gameplay_efecto_defensa, txs_gameplay_efecto_velocidad;
-GLuint textureParticleFountainID;
 
 bool iniciaPartida = false, presionarOpcion = false;
 bool en_pantalla_de_juego = false;
@@ -184,7 +182,7 @@ int lastMousePosX, offsetX = 0;
 int lastMousePosY, offsetY = 0;
 
 // Model matrix definitions
-glm::mat4 modelMatrixFountain = glm::mat4(1.0f);
+glm::mat4 modelMatrixDecoBosque = glm::mat4(1.0f);
 
 glm::mat4 ModelMatrixCazador = glm::mat4(1.0f);
 glm::mat4 ModelMatrixSanador = glm::mat4(1.0f);
@@ -540,7 +538,6 @@ GLuint depthMap, depthMapFBO;
 GLuint initVel, startTime;
 GLuint VAOParticles;
 GLuint nParticles = 400;
-GLuint currTimeParticlesFountainAnimation, lastTimeParticulesFountainAnimation;
 
 // Se definen todos las funciones.
 void reshapeCallback(GLFWwindow *Window, int widthRes, int heightRes);
@@ -686,7 +683,6 @@ void init(int width, int height, std::string strTitle, bool bFullScreen)
 	shaderTexture.initialize("../shaders/texturizado.vs", "../shaders/texturizado.fs");
 	shaderViewDepth.initialize("../shaders/texturizado.vs", "../shaders/texturizado_depth_view.fs");
 	shaderDepth.initialize("../shaders/shadow_mapping_depth.vs", "../shaders/shadow_mapping_depth.fs");
-	shaderParticlesFountain.initialize("../shaders/particlesFountain.vs", "../shaders/particlesFountain.fs");
 
 	// ****************************************************************
 	// init(): MODELOS BÁSICOS
@@ -724,9 +720,9 @@ void init(int width, int height, std::string strTitle, bool bFullScreen)
 	// init(): MODELOS (OBJ, FBX)
 	// ****************************************************************
 
-	// Fountain
-	modelFountain.loadModel("../media/models/fountain/fountain.obj");
-	modelFountain.setShader(&shaderMulLighting);
+	// Decoración Tablero
+	modelDecoBosque.loadModel("../media/models/DecoBosque/DecoBosque.obj");
+	modelDecoBosque.setShader(&shaderMulLighting);
 
 	// Terreno
 	terrain.init();
@@ -766,6 +762,9 @@ void init(int width, int height, std::string strTitle, bool bFullScreen)
 
 	//*******************************************************************+
 
+	// ****************************************************************
+	// init(): SKYBOX
+	// ****************************************************************
 	// Carga de texturas para el skybox
 	Texture skyboxTexture = Texture("");
 	glGenTextures(1, &skyboxTextureID);
@@ -790,14 +789,18 @@ void init(int width, int height, std::string strTitle, bool bFullScreen)
 		skyboxTexture.freeImage();
 	}
 
+	// ****************************************************************
+	// init(): MAPA DE MEZCLAZ
+	// ****************************************************************
+
 	// Definiendo la textura a utilizar
-	Texture textureCesped("../media/textures/grassy2.png");
+	Texture textureK("../media/textures/grassy2.png");
 	// Carga el mapa de bits (FIBITMAP es el tipo de dato de la libreria)
-	textureCesped.loadImage();
+	textureK.loadImage();
 	// Creando la textura con id 1
-	glGenTextures(1, &textureCespedID);
+	glGenTextures(1, &textureTerrainKID);
 	// Enlazar esa textura a una tipo de textura de 2D.
-	glBindTexture(GL_TEXTURE_2D, textureCespedID);
+	glBindTexture(GL_TEXTURE_2D, textureTerrainKID);
 	// set the texture wrapping parameters
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT); // set texture wrapping to GL_REPEAT (default wrapping method)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
@@ -805,28 +808,25 @@ void init(int width, int height, std::string strTitle, bool bFullScreen)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	// Verifica si se pudo abrir la textura
-	if (textureCesped.getData())
+	if (textureK.getData())
 	{
 		// Transferis los datos de la imagen a memoria
 		// Tipo de textura, Mipmaps, Formato interno de openGL, ancho, alto, Mipmaps,
 		// Formato interno de la libreria de la imagen, el tipo de dato y al apuntador
 		// a los datos
-		std::cout << "Numero de canales :=> " << textureCesped.getChannels() << std::endl;
-		glTexImage2D(GL_TEXTURE_2D, 0, textureCesped.getChannels() == 3 ? GL_RGB : GL_RGBA, textureCesped.getWidth(), textureCesped.getHeight(), 0,
-					 textureCesped.getChannels() == 3 ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, textureCesped.getData());
+		std::cout << "Numero de canales :=> " << textureK.getChannels() << std::endl;
+		glTexImage2D(GL_TEXTURE_2D, 0, textureK.getChannels() == 3 ? GL_RGB : GL_RGBA, textureK.getWidth(), textureK.getHeight(), 0,
+					 textureK.getChannels() == 3 ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, textureK.getData());
 		// Generan los niveles del mipmap (OpenGL es el ecargado de realizarlos)
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	else
 		std::cout << "Failed to load texture" << std::endl;
 	// Libera la memoria de la textura
-	textureCesped.freeImage();
+	textureK.freeImage();
 
-	// ****************************************************************
-	// init(): MAPA DE MEZCLAZ
-	// ****************************************************************
 	// Definiendo la textura
-	Texture textureR("../media/textures/mud.png");
+	Texture textureR("../media/textures/uniformed_fire.png");
 	textureR.loadImage();											  // Cargar la textura
 	glGenTextures(1, &textureTerrainRID);							  // Creando el id de la textura del landingpad
 	glBindTexture(GL_TEXTURE_2D, textureTerrainRID);				  // Se enlaza la textura
@@ -846,7 +846,7 @@ void init(int width, int height, std::string strTitle, bool bFullScreen)
 	textureR.freeImage(); // Liberamos memoria
 
 	// Definiendo la textura
-	Texture textureG("../media/textures/grassFlowers.png");
+	Texture textureG("../media/textures/stone_dust.png");
 	textureG.loadImage();											  // Cargar la textura
 	glGenTextures(1, &textureTerrainGID);							  // Creando el id de la textura del landingpad
 	glBindTexture(GL_TEXTURE_2D, textureTerrainGID);				  // Se enlaza la textura
@@ -866,7 +866,7 @@ void init(int width, int height, std::string strTitle, bool bFullScreen)
 	textureG.freeImage(); // Liberamos memoria
 
 	// Definiendo la textura
-	Texture textureB("../media/textures/path.png");
+	Texture textureB("../media/textures/galaxy_universe.png");
 	textureB.loadImage();											  // Cargar la textura
 	glGenTextures(1, &textureTerrainBID);							  // Creando el id de la textura del landingpad
 	glBindTexture(GL_TEXTURE_2D, textureTerrainBID);				  // Se enlaza la textura
@@ -886,7 +886,7 @@ void init(int width, int height, std::string strTitle, bool bFullScreen)
 	textureB.freeImage(); // Liberamos memoria
 
 	// Definiendo la textura
-	Texture textureBlendMap("../media/textures/blendMap.png");
+	Texture textureBlendMap("../media/textures/terrain_blendmap.png");
 	textureBlendMap.loadImage();									  // Cargar la textura
 	glGenTextures(1, &textureTerrainBlendMapID);					  // Creando el id de la textura
 	glBindTexture(GL_TEXTURE_2D, textureTerrainBlendMapID);			  // Se enlaza la textura
@@ -992,8 +992,8 @@ void init(int width, int height, std::string strTitle, bool bFullScreen)
 	// Definiendo la textura
 	Texture texture_tablero("../media/textures/tablero.png");
 	texture_tablero.loadImage();									  // Cargar la textura
-	glGenTextures(1, &texture_tableroID);					  // Creando el id de la textura del landingpad
-	glBindTexture(GL_TEXTURE_2D, texture_tableroID);		  // Se enlaza la textura
+	glGenTextures(1, &texture_tableroID);							  // Creando el id de la textura del landingpad
+	glBindTexture(GL_TEXTURE_2D, texture_tableroID);				  // Se enlaza la textura
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	  // Wrapping en el eje u
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);	  // Wrapping en el eje v
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // Filtering de minimización
@@ -1072,26 +1072,6 @@ void init(int width, int height, std::string strTitle, bool bFullScreen)
 	else
 		std::cout << "Fallo la carga de textura" << std::endl;
 	texture_efecto_03.freeImage(); // Liberamos memoria
-
-	// Definiendo la textura
-	Texture textureParticlesFountain("../media/textures/bluewater.png");
-	textureParticlesFountain.loadImage();							  // Cargar la textura
-	glGenTextures(1, &textureParticleFountainID);					  // Creando el id de la textura del landingpad
-	glBindTexture(GL_TEXTURE_2D, textureParticleFountainID);		  // Se enlaza la textura
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	  // Wrapping en el eje u
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);	  // Wrapping en el eje v
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // Filtering de minimización
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // Filtering de maximimizacion
-	if (textureParticlesFountain.getData())
-	{
-		// Transferir los datos de la imagen a la tarjeta
-		glTexImage2D(GL_TEXTURE_2D, 0, textureParticlesFountain.getChannels() == 3 ? GL_RGB : GL_RGBA, textureParticlesFountain.getWidth(), textureParticlesFountain.getHeight(), 0,
-					 textureParticlesFountain.getChannels() == 3 ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, textureParticlesFountain.getData());
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else
-		std::cout << "Fallo la carga de textura" << std::endl;
-	textureParticlesFountain.freeImage(); // Liberamos memoria
 
 	// ****************************************************************
 	// init(): OpenAL
@@ -1180,7 +1160,6 @@ void destroy()
 	shaderMulLighting.destroy();
 	shaderSkybox.destroy();
 	shaderTerrain.destroy();
-	shaderParticlesFountain.destroy();
 
 	// Basic objects Delete
 	skyboxSphere.destroy();
@@ -1202,14 +1181,14 @@ void destroy()
 	ModelAnfiteres.destroy();
 
 	// Custom objects Delete
-	modelFountain.destroy();
+	modelDecoBosque.destroy();
 
 	// Terrains objects Delete
 	terrain.destroy();
 
 	// Textures Delete
 	glBindTexture(GL_TEXTURE_2D, 0);
-	glDeleteTextures(1, &textureCespedID);
+	glDeleteTextures(1, &textureTerrainKID);
 	glDeleteTextures(1, &texture_tableroID);
 	glDeleteTextures(1, &textureTerrainBID);
 	glDeleteTextures(1, &textureTerrainGID);
@@ -1222,7 +1201,6 @@ void destroy()
 	glDeleteTextures(1, &txs_gameplay_efecto_ataque);
 	glDeleteTextures(1, &txs_gameplay_efecto_defensa);
 	glDeleteTextures(1, &txs_gameplay_efecto_velocidad);
-	glDeleteTextures(1, &textureParticleFountainID);
 
 	// Cube Maps Delete
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
@@ -1693,18 +1671,12 @@ void prepareScene()
 {
 
 	terrain.setShader(&shaderTerrain);
-
-	// Fountain
-	modelFountain.setShader(&shaderMulLighting);
 }
 
 void prepareDepthScene()
 {
 
 	terrain.setShader(&shaderDepth);
-
-	// Fountain
-	modelFountain.setShader(&shaderDepth);
 }
 
 void renderSolidScene()
@@ -1714,7 +1686,7 @@ void renderSolidScene()
 	 *******************************************/
 	// Se activa la textura del agua
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, textureCespedID);
+	glBindTexture(GL_TEXTURE_2D, textureTerrainKID);
 	shaderTerrain.setInt("backgroundTexture", 0);
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, textureTerrainRID);
@@ -1740,12 +1712,8 @@ void renderSolidScene()
 	// MODELOS (OBJ, FBX)
 	// ****************************************************************
 
-	// Fountain
-	glDisable(GL_CULL_FACE);
-	modelMatrixFountain[3][1] = terrain.getHeightTerrain(modelMatrixFountain[3][0], modelMatrixFountain[3][2]) + 0.2;
-	glm::mat4 modelMatrixFountainCopy = glm::scale(modelMatrixFountain, glm::vec3(10.0f, 10.0f, 10.0f));
-	modelFountain.render(modelMatrixFountainCopy);
-	glEnable(GL_CULL_FACE);
+	glm::mat4 renderMatrix_DecoBosque = glm::mat4(modelMatrixDecoBosque);
+	modelDecoBosque.render(renderMatrix_DecoBosque);
 
 	// Models Huesos
 	glm::mat4 renderMatrixCazador = glm::mat4(ModelMatrixCazador);
@@ -1888,7 +1856,8 @@ void applicationLoop()
 	// ****************************************************************
 	// applicationLoop(): POSICIÓN INICIAL DE LOS MODELOS
 	// ****************************************************************
-	modelMatrixFountain = glm::translate(modelMatrixFountain, glm::vec3(5.0, 0.0, -40.0));
+
+	modelMatrixDecoBosque = glm::translate(modelMatrixDecoBosque, glm::vec3(0.0, 0.0, 0.0));
 
 	ModelMatrixCazador = glm::translate(ModelMatrixCazador, glm::vec3(10.0, 0.0, -50.0));
 
@@ -1982,11 +1951,6 @@ void applicationLoop()
 								 glm::value_ptr(view));
 		shaderTerrain.setMatrix4("lightSpaceMatrix", 1, false,
 								 glm::value_ptr(lightSpaceMatrix));
-		// Settea la matriz de vista y projection al shader para el fountain
-		/*shaderParticlesFountain.setMatrix4("projection", 1, false,
-				glm::value_ptr(projection));
-		shaderParticlesFountain.setMatrix4("view", 1, false,
-				glm::value_ptr(view));*/
 
 		/*******************************************
 		 * Propiedades de neblina
@@ -2304,11 +2268,6 @@ void applicationLoop()
 		// ****************************************************************
 		// applicationLoop(): while(psi): OpenAL (sound data)
 		// ****************************************************************
-
-		source0Pos[0] = modelMatrixFountain[3].x;
-		source0Pos[1] = modelMatrixFountain[3].y;
-		source0Pos[2] = modelMatrixFountain[3].z;
-		alSourcefv(al_sources[0], AL_POSITION, source0Pos);
 
 		// Listener for the First person camera
 		listenerPos[0] = camera1P->getPosition().x;
