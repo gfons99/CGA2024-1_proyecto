@@ -230,9 +230,12 @@ float dorRotCount = 0.0;
 
 //--------------------------------------------------------------------------------------------
 // bool Casilla_conbate=false ,Casilla_buffo = false, Casilla_jefe=false;
-int buffo = 0;
 int combate = 0;
 int diceValue = 1; // Valor del dado
+int Tipo_Casilla = 0;
+int buffo = 0;
+// int keyTablero[28] = {0, 1, 2, 2, 1, 2, 3, 2, 1, 2, 2, 1, 2, 3, 2, 1, 2, 2, 1, 2, 3, 2, 1, 2, 2, 1, 2, 3};
+
 //--------------------------------------------------------------------------------------------
 //-----------------------------------------------------------------
 // Definición de una estructura para un personaje
@@ -242,9 +245,12 @@ struct Personaje
 	int ataque;
 	int defensa;
 	int vida;
+	int vidaMx;
 	int movimiento;
 	int PossTablero;
 	int TiradaSalvacion;
+	int CD;
+	int CDMX;
 };
 
 // Función para inicializar un personaje basado en el tipo
@@ -259,36 +265,52 @@ struct Personaje inicializarPersonaje(int tipo_personaje)
 		personaje.ataque = 5;
 		personaje.defensa = 2;
 		personaje.vida = 6;
+		personaje.vidaMx = 6;
 		personaje.movimiento = 5;
 		personaje.PossTablero = 0;
 		personaje.TiradaSalvacion = 4;
+		personaje.CD = 3;
+		personaje.CDMX = 3;
+
 		break;
 	case 2:
 		personaje.TipoPj = 2;
 		personaje.ataque = 2;
 		personaje.defensa = 3;
 		personaje.vida = 10;
+		personaje.vidaMx = 10;
 		personaje.movimiento = 6;
 		personaje.PossTablero = 0;
 		personaje.TiradaSalvacion = 3;
+		personaje.CD = 4;
+		personaje.CDMX = 4;
+
 		break;
 	case 3:
 		personaje.TipoPj = 3;
 		personaje.ataque = 3;
 		personaje.defensa = 5;
 		personaje.vida = 8;
+		personaje.vidaMx = 8;
 		personaje.movimiento = 3;
 		personaje.PossTablero = 0;
 		personaje.TiradaSalvacion = 4;
+		personaje.CD = 2;
+		personaje.CDMX = 2;
+
 		break;
 	case 4:
 		personaje.TipoPj = 4;
 		personaje.ataque = 4;
 		personaje.defensa = 1;
 		personaje.vida = 10;
+		personaje.vidaMx = 10;
 		personaje.movimiento = 4;
 		personaje.PossTablero = 0;
 		personaje.TiradaSalvacion = 5;
+		personaje.CD = 3;
+		personaje.CDMX = 3;
+
 		break;
 	default:
 		// En caso de un tipo de personaje no reconocido, se inicializan todos los valores a 0
@@ -416,20 +438,146 @@ Personaje TiradaDeSalvacion(Personaje Pj)
 	{
 		Pj = inicializarPersonaje(Pj.TipoPj);
 		printf("Tirada de salvacion exitosa\n");
+	}else {
+		printf("Pj Muerto y Su tirada de Salvacion fallo");
 	}
 	return Pj;
 }
 
-void Tablero(Personaje *Pj, int dado, Monstruo *Ms, Monstruo *Anfiteres)
+void PerderBuffo(int buffo, Personaje *Pj)
+{
+	if (buffo == 1)
+	{
+		Pj->ataque -= 2;
+		printf("Buffo 1 perdido\n");
+	}
+	if (buffo == 2)
+	{
+		Pj->defensa -= 2;
+		printf("Buffo 2 perdido\n");
+	}
+	if (buffo == 3)
+	{
+		Pj->movimiento -= 2;
+		printf("Buffo 3 perdido\n");
+	}
+}
+int keyTablero(int TC)
+{
+	int KeyTC;
+	switch (TC)
+	{
+	case 0:
+		KeyTC = 0;
+		break;
+	case 1:
+		KeyTC = 1;
+		break;
+	case 2:
+		KeyTC = 2;
+		break;
+	case 3:
+		KeyTC = 2;
+		break;
+	case 4:
+		KeyTC = 1;
+		break;
+	case 5:
+		KeyTC = 2;
+		break;
+	case 6:
+		KeyTC = 3;
+		break;
+	case 7:
+		KeyTC = 2;
+		break;
+	case 8:
+		KeyTC = 1;
+		break;
+	case 9:
+		KeyTC = 2;
+		break;
+	case 10:
+		KeyTC = 2;
+		break;
+	case 11:
+		KeyTC = 1;
+		break;
+	case 12:
+		KeyTC = 2;
+		break;
+	case 13:
+		KeyTC = 3;
+		break;
+	case 14:
+		KeyTC = 2;
+		break;
+	case 15:
+		KeyTC = 1;
+		break;
+	case 16:
+		KeyTC = 2;
+		break;
+	case 17:
+		KeyTC = 2;
+		break;
+	case 18:
+		KeyTC = 1;
+		break;
+	case 19:
+		KeyTC = 2;
+		break;
+	case 20:
+		KeyTC = 3;
+		break;
+	case 21:
+		KeyTC = 2;
+		break;
+	case 22:
+		KeyTC = 1;
+		break;
+	case 23:
+		KeyTC = 2;
+		break;
+	case 24:
+		KeyTC = 2;
+		break;
+	case 25:
+		KeyTC = 1;
+		break;
+	case 26:
+		KeyTC = 2;
+		break;
+	case 27:
+		KeyTC = 3;
+		break;
+
+	default:
+		break;
+	}
+	return KeyTC;
+}
+
+void Tablero(Personaje *Pj, int dado, Monstruo *Ms, Monstruo *Anfiteres, int Tipo_Casilla)
 {
 	printf("Entraste al tablero.\n");
+	if(Pj->CD < Pj->CDMX ){
+		Pj->CD = Pj->CD + 1;
+	}
 	Pj->PossTablero = Pj->movimiento + dado;
 
-	int Tipo_Casilla = 1 + rand() % 3;
-
-	int buffo = 1 + rand() % 3;
-	switch (Tipo_Casilla)
+	if (Pj->PossTablero >= 27)
 	{
+		Pj->PossTablero = 0;
+	}
+
+	buffo = 1 + rand() % 3;
+	switch (Tipo_Casilla)
+
+	{
+	case 0:
+		Pj->vida = Pj->vidaMx;
+		break;
 	case 1:
 		if (buffo == 1)
 		{
@@ -457,7 +605,6 @@ void Tablero(Personaje *Pj, int dado, Monstruo *Ms, Monstruo *Anfiteres)
 		Combate(Pj, Anfiteres);
 		printf("Combate con jefe.\n");
 		break;
-
 	default:
 		break;
 	}
@@ -1451,30 +1598,40 @@ bool processInput(bool continueApplication)
 	}
 	else if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_RELEASE)
 		enableCountSelected = true;
-		if(glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS && !enableTirada){
-			enableTirada = true;
-		}else if(glfwGetKey(window, GLFW_KEY_T) == GLFW_RELEASE && enableTirada){
-			enableTirada = false;
+	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS && !enableTirada)
+	{
+		enableTirada = true;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_T) == GLFW_RELEASE && enableTirada)
+	{
+		enableTirada = false;
+	}
 
-		}
-		
-		
 	//--------------------------------------------------------
 	if (modelSelected == 1 && enableTirada)
 	{
+
 		// tirada de salvacion antes de realizar su acciones
 		if (CazadorSelected && Cazador.vida > 0)
 		{
 			if (CazadorSelected && glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
 			{ // tira el dado y avanza
+
 				CazadorSelected = false;
 
-				int dado = 1 + rand() % 5;
+				int dado = 1 + rand() % 6;
 				printf("Entro a accion 1 del cazador y el dado dio %d\n", dado);
 
 				GeneradorMs = MostruosGenerdor(GeneradorMs);
 
-				Tablero(&Cazador, dado, &GeneradorMs, &Anfiteres);
+				Tipo_Casilla = keyTablero(Cazador.movimiento + dado);
+
+				Tablero(&Cazador, dado, &GeneradorMs, &Anfiteres, Tipo_Casilla);
+
+				if (Tipo_Casilla == 1)
+				{
+					PerderBuffo(buffo, &Cazador);
+				}
 
 				ModelMatrixCazador = glm::translate(ModelMatrixCazador, glm::vec3(10.0 + Cazador.PossTablero, 0.0, -50.0));
 
@@ -1483,30 +1640,49 @@ bool processInput(bool continueApplication)
 				printf("Entro a accion 1 del cazador y su vida es %d\n", Cazador.vida);
 				printf("Entro a accion 1 del cazador y su poss es %d\n", Cazador.PossTablero);
 
-				printf("Entro a accion Ms vida %d\n", GeneradorMs.vida);
+				printf("Habilidad en CD Tira el Dado (Accion 1) CD %d / %d",Cazador.CD,Cazador.CDMX );
 			}
+
 			if (CazadorSelected && glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
 			{ // diplica su dañao y avanza
+				if (Cazador.CD == Cazador.CDMX)
+				{
+					Cazador.ataque = Cazador.ataque * 2;
+					int dado = 1 + rand() % 6;
+					printf("Entro a accion 2 del cazador y el dado dio %d\n", dado);
+					printf("Entro a accion 2 del cazador y su ataque es %d\n", Cazador.ataque);
 
-				CazadorSelected = false;
+					GeneradorMs = MostruosGenerdor(GeneradorMs);
+					Tipo_Casilla = keyTablero(Cazador.movimiento + dado);
 
-				Cazador.ataque = Cazador.ataque * 2;
-				int dado = 1 + rand() % 5;
-				printf("Entro a accion 2 del cazador y el dado dio %d\n", dado);
-				printf("Entro a accion 2 del cazador y su ataque es %d\n", Cazador.ataque);
-				GeneradorMs = MostruosGenerdor(GeneradorMs);
-				Tablero(&Cazador, dado, &GeneradorMs, &Anfiteres);
-				Cazador.ataque = Cazador.ataque / 2;
-				printf("Entro a accion 2 del cazador y su ataque es %d\n", Cazador.ataque);
-				printf("Entro a accion 2 del cazador y su defensa es %d\n", Cazador.defensa);
-				printf("Entro a accion 2 del cazador y su vida es %d\n", Cazador.vida);
-				printf("Entro a accion 2 del cazador y su poss es %d\n", Cazador.PossTablero);
-				printf("Entro a accion Ms vida %d\n", GeneradorMs.vida);
+					Tablero(&Cazador, dado, &GeneradorMs, &Anfiteres, Tipo_Casilla);
+					Cazador.ataque = Cazador.ataque / 2;
+
+					if (Tipo_Casilla == 1)
+					{
+						PerderBuffo(buffo, &Cazador);
+					}
+
+					printf("Entro a accion 2 del cazador y su ataque es %d\n", Cazador.ataque);
+					printf("Entro a accion 2 del cazador y su defensa es %d\n", Cazador.defensa);
+					printf("Entro a accion 2 del cazador y su vida es %d\n", Cazador.vida);
+					printf("Entro a accion 2 del cazador y su poss es %d\n", Cazador.PossTablero);
+					printf("Entro a accion Ms vida %d\n", GeneradorMs.vida);
+
+					Cazador.CD = 0;
+					CazadorSelected = false;
+				}
+				else
+				{
+					printf("Habilidad en CD Tira el Dado (Accion 1) CD %d / %d",Cazador.CD,Cazador.CDMX );
+				}
 			}
-		}else if (CazadorSelected && Cazador.vida <= 0){
+		}
+		else if (CazadorSelected && Cazador.vida <= 0)
+		{
 			Cazador = TiradaDeSalvacion(Cazador);
-			printf("Cazador Muerto y Su tirada de Salvacion fallo");
-			CazadorSelected= false;
+			
+			CazadorSelected = false;
 		}
 	}
 
@@ -1523,7 +1699,7 @@ bool processInput(bool continueApplication)
 				SanadorSelected = false;
 				int dado = 1 + rand() % 5;
 				GeneradorMs = MostruosGenerdor(GeneradorMs);
-				Tablero(&Sanador, dado, &GeneradorMs, &Anfiteres);
+				Tablero(&Sanador, dado, &GeneradorMs, &Anfiteres, Tipo_Casilla);
 
 				printf("Entro a accion 1 del sanador y su ataque es %d\n", Sanador.ataque);
 				printf("Entro a accion 1 del sanador y su defensa es %d\n", Sanador.defensa);
@@ -1550,7 +1726,7 @@ bool processInput(bool continueApplication)
 				}
 				int dado = 1 + rand() % 5;
 				GeneradorMs = MostruosGenerdor(GeneradorMs);
-				Tablero(&Sanador, dado, &GeneradorMs, &Anfiteres);
+				Tablero(&Sanador, dado, &GeneradorMs, &Anfiteres, Tipo_Casilla);
 				printf("Entro a accion 2 del sanador y su ataque es %d\n", Sanador.ataque);
 				printf("Entro a accion 2 del sanador y su defensa es %d\n", Sanador.defensa);
 				printf("Entro a accion 2 del sanador y su vida es %d\n", Sanador.vida);
@@ -1575,7 +1751,7 @@ bool processInput(bool continueApplication)
 				CaballeroSelected = false;
 				int dado = 1 + rand() % 5;
 				GeneradorMs = MostruosGenerdor(GeneradorMs);
-				Tablero(&Caballero, dado, &GeneradorMs, &Anfiteres);
+				Tablero(&Caballero, dado, &GeneradorMs, &Anfiteres, Tipo_Casilla);
 
 				printf("Entro a accion 1 del caballero y su ataque es %d\n", Caballero.ataque);
 				printf("Entro a accion 1 del caballero y su defensa es %d\n", Caballero.defensa);
@@ -1590,7 +1766,7 @@ bool processInput(bool continueApplication)
 				Caballero.defensa = Caballero.defensa + 2;
 				int dado = 1 + rand() % 5;
 				MostruosGenerdor(GeneradorMs);
-				Tablero(&Caballero, dado, &GeneradorMs, &Anfiteres);
+				Tablero(&Caballero, dado, &GeneradorMs, &Anfiteres, Tipo_Casilla);
 				Caballero.defensa = Caballero.defensa - 2;
 				printf("Entro a accion 2 del caballero y su ataque es %d\n", Caballero.ataque);
 				printf("Entro a accion 2 del caballero y su defensa es %d\n", Caballero.defensa);
@@ -1614,7 +1790,7 @@ bool processInput(bool continueApplication)
 			VengadorSelected = false;
 			int dado = 1 + rand() % 5;
 			MostruosGenerdor(GeneradorMs);
-			Tablero(&Vengador, dado, &GeneradorMs, &Anfiteres);
+			Tablero(&Vengador, dado, &GeneradorMs, &Anfiteres, Tipo_Casilla);
 			printf("Entro a accion 1 del vengador y su ataque es %d\n", Vengador.ataque);
 			printf("Entro a accion 1 del vengador y su defensa es %d\n", Vengador.defensa);
 			printf("Entro a accion 1 del vengador y su vida es %d\n", Vengador.vida);
@@ -1628,7 +1804,7 @@ bool processInput(bool continueApplication)
 			Vengador.ataque = Vengador.ataque + (10 - Vengador.vida);
 			int dado = 1 + rand() % 5;
 			MostruosGenerdor(GeneradorMs);
-			Tablero(&Vengador, dado, &GeneradorMs, &Anfiteres);
+			Tablero(&Vengador, dado, &GeneradorMs, &Anfiteres, Tipo_Casilla);
 			modelSelected = 1;
 			printf("Entro a accion 2 del vengador y su ataque es %d\n", Vengador.ataque);
 			printf("Entro a accion 2 del vengador y su defensa es %d\n", Vengador.defensa);
