@@ -238,16 +238,17 @@ int buffo = 0;
 // Definición de una estructura para un personaje
 struct Personaje
 {
-	int TipoPj;
-	int ataque;
-	int defensa;
-	int vida;
-	int vidaMx;
-	int movimiento;
-	int PossTablero;
-	int TiradaSalvacion;
-	int CD;
-	int CDMX;
+	// Valores base de cada persoanje
+	int TipoPj;			 // Tipo de Personaje
+	int ataque;			 // Ataque de Personaje
+	int defensa;		 // Defensa de Personaje
+	int vida;			 // Vida de Personaje (Se modifica constante mente despues de cada accion)
+	int vidaMx;			 // Vida MAX de Personje
+	int movimiento;		 // Movimientos de Peronsonaje
+	int PossTablero;	 // Posicion de Personaje en el Tableor
+	int TiradaSalvacion; // Tirada de salvacion del personje
+	int CD;				 // Cooldown de Personaje (Se modifica constante mente despues de cada accion)
+	int CDMX;			 // Cooldown MAX de Personaje
 };
 
 // Función para inicializar un personaje basado en el tipo
@@ -326,9 +327,9 @@ struct Personaje inicializarPersonaje(int tipo_personaje)
 // Definición de una estructura para los monstruos
 struct Monstruo
 {
-	int ataque;
-	int defensa;
-	int vida;
+	int ataque;	 // Ataque de Monstruo
+	int defensa; // Defensa de Monstruo
+	int vida;	 // vida de Monstruo
 };
 
 // Función para inicializar un monstruo basado en el tipo
@@ -370,6 +371,7 @@ struct Monstruo inicializarMonstruo(int tipo_monstruo)
 }
 
 //------------------------------------------------------------------
+// inicializacion de Pj y Ms pricipales
 
 struct Personaje Cazador = inicializarPersonaje(1);
 struct Personaje Sanador = inicializarPersonaje(2);
@@ -380,7 +382,7 @@ struct Monstruo GeneradorMs = inicializarMonstruo(0);
 struct Monstruo Anfiteres = inicializarMonstruo(3);
 
 //--------------------------------------------------------------------
-
+//conbate
 void Combate(Personaje *Pj, Monstruo *Ms)
 {
 	printf("Entraste al combate.\n");
@@ -1676,51 +1678,27 @@ bool processInput(bool continueApplication)
 					PerderBuffo(buffo, &Cazador);
 				}
 
-				if (Cazador.PossTablero < 7)
+				if (Cazador.PossTablero > 0 && Cazador.PossTablero < 7)
 				{
 					ModelMatrixCazador = glm::translate(ModelMatrixCazador, glm::vec3(0.0 - Cazador.PossTablero * 6.25, 0.0, 0.0));
 				}
-				else if (Cazador.PossTablero < 14)
+				else if (Cazador.PossTablero > 6 && Cazador.PossTablero < 14)
 				{
-					ModelMatrixCazador = glm::translate(ModelMatrixCazador, glm::vec3(-6*6.5, 0.0, 0.0 - (Cazador.PossTablero - 6) * 6.25));
+					ModelMatrixCazador = glm::translate(ModelMatrixCazador, glm::vec3(-37.5, 0.0, 0.0 - (Cazador.PossTablero - 6) * 6.25));
 				}
-				else if (Cazador.PossTablero < 21)
+				else if (Cazador.PossTablero > 13 && Cazador.PossTablero < 21)
 				{
-					ModelMatrixCazador = glm::translate(ModelMatrixCazador, glm::vec3(0.0 + (Cazador.PossTablero - 13) * 6.25, 0.0,6*6.5));
+					ModelMatrixCazador = glm::translate(ModelMatrixCazador, glm::vec3(-37.5 + (Cazador.PossTablero - 13) * 6.25, 0.0, -37.5));
 				}
-				else if (Cazador.PossTablero < 28)
+				else if (Cazador.PossTablero > 20 && Cazador.PossTablero < 28)
 				{
-					ModelMatrixCazador = glm::translate(ModelMatrixCazador, glm::vec3(0.0, 0.0, 0.0 + (Cazador.PossTablero - 20) * 6.25));
+					ModelMatrixCazador = glm::translate(ModelMatrixCazador, glm::vec3(0.0, 0.0, -37.5 + (Cazador.PossTablero - 20) * 6.25));
 				}
-				else if (Cazador.PossTablero >= 28)
+				else if (Cazador.PossTablero > 27)
 				{
 					Cazador.PossTablero = 0;
-					ModelMatrixCazador = glm::translate(ModelMatrixCazador, glm::vec3(0.0, 0.0, 0.0));
+					ModelMatrixCazador = glm::translate(ModelMatrixCazador, glm::vec3(16.625, 0.0, 20.885));
 				}
-
-				/*if (Cazador.PossTablero < 7)
-				{
-					ModelMatrixCazador = glm::translate(ModelMatrixCazador, glm::vec3(0.0 - Cazador.PossTablero * 6.25, 0.0, 0.0));
-				}
-				else if (Cazador.PossTablero < 14)
-				{
-
-					ModelMatrixCazador = glm::translate(ModelMatrixCazador, glm::vec3((-6 * 6.25), 0.0, 0.0 - (Cazador.PossTablero - 6) * 6.25));
-				}
-				else if (Cazador.PossTablero < 21)
-				{
-
-					ModelMatrixCazador = glm::translate(ModelMatrixCazador, glm::vec3(0.0 + (Cazador.PossTablero - 13) * 6.25, 0.0, (-6 * 6.25)));
-				}
-				else if (Cazador.PossTablero < 28)
-				{
-					ModelMatrixCazador = glm::translate(ModelMatrixCazador, glm::vec3(0.0, 0.0, 0.0 + (Cazador.PossTablero - 20) * 6.25));
-				}
-				else if (Cazador.PossTablero > 28)
-				{
-					Cazador.PossTablero = 0;
-					ModelMatrixCazador = glm::translate(ModelMatrixCazador, glm::vec3(0.0, 0.0, 0.0));
-				}*/
 
 				printf("Entro a accion 1 del cazador y su ataque es %d\n", Cazador.ataque);
 				printf("Entro a accion 1 del cazador y su defensa es %d\n", Cazador.defensa);
