@@ -93,8 +93,13 @@ Shader shaderViewDepth;
 // CÁMARAS
 // ****************************************************************
 std::shared_ptr<FirstPersonCamera> camera1P(new FirstPersonCamera());
+
 std::shared_ptr<ThirdPersonCamera> camera3P(new ThirdPersonCamera());
-std::string cameraState = "libre";
+
+std::shared_ptr<ThirdPersonCamera> camera3PTablero(new ThirdPersonCamera());
+std::shared_ptr<ThirdPersonCamera> camera3P3Pj(new ThirdPersonCamera());
+
+std::string cameraState = "tercera_p";
 bool enable_camera = true;
 float distanceFromTarget = 7.0;
 
@@ -887,7 +892,9 @@ void init(int width, int height, std::string strTitle, bool bFullScreen)
 	// Nota. Para una cámara en tercera persona, no se ocupa un posición
 	camera1P->setPosition(glm::vec3(0.0, 10.0, 0.0));
 
-	camera3P->setPosition(glm::vec3(0.0, 3.0, 4.0));
+	// camera3P->setPosition(glm::vec3(0.0, 5.0, 4.0));
+	//  camera3P->setAngleTarget(90.0f); // Ángulo de inclinación para mirar hacia abajo (90 grados)
+	//  camera3P->setYaw(0.0f);   // Ángulo de giro horizontal (puede ser 0 o cualquier otro valor)
 	camera3P->setSensitivity(1.0f);
 	camera3P->setDistanceFromTarget(distanceFromTarget);
 
@@ -1663,6 +1670,7 @@ bool processInput(bool continueApplication)
 				{
 					PerderBuffo(buffo, &Cazador);
 				}
+
 				//----------------------Movimientos-------------------------------------
 				if (Cazador.PossTablero > 0 && Cazador.PossTablero < 7)
 				{
@@ -2005,6 +2013,7 @@ bool processInput(bool continueApplication)
 		if (SanadorSelected && Sanador.vida <= 0)
 		{
 			Sanador = TiradaDeSalvacion(Sanador);
+			SanadorSelected = false;
 		}
 	}
 	if (modelSelected == 3 && enableTirada)
@@ -2162,6 +2171,7 @@ bool processInput(bool continueApplication)
 		if (CaballeroSelected && Caballero.vida <= 0)
 		{
 			Caballero = TiradaDeSalvacion(Caballero);
+			CaballeroSelected = false;
 		}
 	}
 
@@ -2179,61 +2189,61 @@ bool processInput(bool continueApplication)
 				PerderBuffo(buffo, &Vengador);
 			}
 			//----------------------Movimientos-------------------------------------
-				if (Vengador.PossTablero > 0 && Vengador.PossTablero < 7)
+			if (Vengador.PossTablero > 0 && Vengador.PossTablero < 7)
+			{
+				ModelMatrixVengador = glm::translate(ModelMatrixVengador, glm::vec3(0.0 - (dado) * 6.2, 0.0, 0.0));
+				Vengador.BanderaPos1 = 6 - Vengador.PossTablero;
+			}
+			else if (Vengador.PossTablero > 6 && Vengador.PossTablero < 14)
+			{
+				if (Vengador.BanderaPos1 > 0)
 				{
-					ModelMatrixVengador = glm::translate(ModelMatrixVengador, glm::vec3(0.0 - (dado) * 6.2, 0.0, 0.0));
-					Vengador.BanderaPos1 = 6 - Vengador.PossTablero;
+					ModelMatrixVengador = glm::translate(ModelMatrixVengador, glm::vec3(0.0 - Vengador.BanderaPos1 * 6.2, 0.0, 0.0 - (dado - Vengador.BanderaPos1) * 6.2));
+					Vengador.BanderaPos1 = 0;
 				}
-				else if (Vengador.PossTablero > 6 && Vengador.PossTablero < 14)
+				else if (Vengador.BanderaPos1 < 1)
 				{
-					if (Vengador.BanderaPos1 > 0)
-					{
-						ModelMatrixVengador = glm::translate(ModelMatrixVengador, glm::vec3(0.0 - Vengador.BanderaPos1 * 6.2, 0.0, 0.0 - (dado - Vengador.BanderaPos1) * 6.2));
-						Vengador.BanderaPos1 = 0;
-					}
-					else if (Vengador.BanderaPos1 < 1)
-					{
-						ModelMatrixVengador = glm::translate(ModelMatrixVengador, glm::vec3(0.0, 0.0, 0.0 - (dado) * 6.2));
-						Vengador.BanderaPos2 = 13 - Vengador.PossTablero;
-					}
+					ModelMatrixVengador = glm::translate(ModelMatrixVengador, glm::vec3(0.0, 0.0, 0.0 - (dado) * 6.2));
+					Vengador.BanderaPos2 = 13 - Vengador.PossTablero;
 				}
-				else if (Vengador.PossTablero > 13 && Vengador.PossTablero < 21)
+			}
+			else if (Vengador.PossTablero > 13 && Vengador.PossTablero < 21)
+			{
+				if (Vengador.BanderaPos2 > 0)
 				{
-					if (Vengador.BanderaPos2 > 0)
-					{
-						ModelMatrixVengador = glm::translate(ModelMatrixVengador, glm::vec3(0.0 + (dado - Vengador.BanderaPos2) * 6.2, 0.0, 0.0 - Vengador.BanderaPos2 * 6.2));
-						Caballero.BanderaPos2 = 0;
-					}
-					else if (Vengador.BanderaPos2 < 1)
-					{
-						ModelMatrixVengador = glm::translate(ModelMatrixVengador, glm::vec3(0.0 + (dado) * 6.2, 0.0, 0.0));
-						Vengador.BanderaPos3 = 20 - Vengador.PossTablero;
-					}
+					ModelMatrixVengador = glm::translate(ModelMatrixVengador, glm::vec3(0.0 + (dado - Vengador.BanderaPos2) * 6.2, 0.0, 0.0 - Vengador.BanderaPos2 * 6.2));
+					Caballero.BanderaPos2 = 0;
 				}
-				else if (Vengador.PossTablero > 20 && Vengador.PossTablero < 28)
+				else if (Vengador.BanderaPos2 < 1)
 				{
-					if (Vengador.BanderaPos3 > 0)
-					{
-						ModelMatrixVengador = glm::translate(ModelMatrixVengador, glm::vec3(0.0 + Vengador.BanderaPos3 * 6.2, 0.0, 0.0 + (dado - Vengador.BanderaPos3) * 6.2));
-						Vengador.BanderaPos3 = 0;
-					}
-					else if (Vengador.BanderaPos3 < 1)
-					{
-						ModelMatrixVengador = glm::translate(ModelMatrixVengador, glm::vec3(0.0, 0.0, 0.0 + (dado) * 6.2));
-						Vengador.BanderaPos4 = 27 - Vengador.PossTablero;
-					}
+					ModelMatrixVengador = glm::translate(ModelMatrixVengador, glm::vec3(0.0 + (dado) * 6.2, 0.0, 0.0));
+					Vengador.BanderaPos3 = 20 - Vengador.PossTablero;
 				}
-				else if (Vengador.PossTablero > 27)
+			}
+			else if (Vengador.PossTablero > 20 && Vengador.PossTablero < 28)
+			{
+				if (Vengador.BanderaPos3 > 0)
 				{
-					if (Vengador.BanderaPos4 > 0)
-					{
+					ModelMatrixVengador = glm::translate(ModelMatrixVengador, glm::vec3(0.0 + Vengador.BanderaPos3 * 6.2, 0.0, 0.0 + (dado - Vengador.BanderaPos3) * 6.2));
+					Vengador.BanderaPos3 = 0;
+				}
+				else if (Vengador.BanderaPos3 < 1)
+				{
+					ModelMatrixVengador = glm::translate(ModelMatrixVengador, glm::vec3(0.0, 0.0, 0.0 + (dado) * 6.2));
+					Vengador.BanderaPos4 = 27 - Vengador.PossTablero;
+				}
+			}
+			else if (Vengador.PossTablero > 27)
+			{
+				if (Vengador.BanderaPos4 > 0)
+				{
 
-						ModelMatrixVengador = glm::translate(ModelMatrixVengador, glm::vec3(0.0 + Vengador.BanderaPos4 * 6.2, 0.0, 0.0 - 6.2));
-						Vengador.PossTablero = 0;
-						Vengador.BanderaPos4 = 0;
-					}
+					ModelMatrixVengador = glm::translate(ModelMatrixVengador, glm::vec3(0.0 + Vengador.BanderaPos4 * 6.2, 0.0, 0.0 - 6.2));
+					Vengador.PossTablero = 0;
+					Vengador.BanderaPos4 = 0;
 				}
-				//------------------------Fin Movimienots-----------------------------------------------
+			}
+			//------------------------Fin Movimienots-----------------------------------------------
 			printf("Entro a accion 1 del vengador y su ataque es %d\n", Vengador.ataque);
 			printf("Entro a accion 1 del vengador y su defensa es %d\n", Vengador.defensa);
 			printf("Entro a accion 1 del vengador y su vida es %d\n", Vengador.vida);
@@ -2252,61 +2262,61 @@ bool processInput(bool continueApplication)
 				PerderBuffo(buffo, &Vengador);
 			}
 			//----------------------Movimientos-------------------------------------
-				if (Vengador.PossTablero > 0 && Vengador.PossTablero < 7)
+			if (Vengador.PossTablero > 0 && Vengador.PossTablero < 7)
+			{
+				ModelMatrixVengador = glm::translate(ModelMatrixVengador, glm::vec3(0.0 - (dado) * 6.2, 0.0, 0.0));
+				Vengador.BanderaPos1 = 6 - Vengador.PossTablero;
+			}
+			else if (Vengador.PossTablero > 6 && Vengador.PossTablero < 14)
+			{
+				if (Vengador.BanderaPos1 > 0)
 				{
-					ModelMatrixVengador = glm::translate(ModelMatrixVengador, glm::vec3(0.0 - (dado) * 6.2, 0.0, 0.0));
-					Vengador.BanderaPos1 = 6 - Vengador.PossTablero;
+					ModelMatrixVengador = glm::translate(ModelMatrixVengador, glm::vec3(0.0 - Vengador.BanderaPos1 * 6.2, 0.0, 0.0 - (dado - Vengador.BanderaPos1) * 6.2));
+					Vengador.BanderaPos1 = 0;
 				}
-				else if (Vengador.PossTablero > 6 && Vengador.PossTablero < 14)
+				else if (Vengador.BanderaPos1 < 1)
 				{
-					if (Vengador.BanderaPos1 > 0)
-					{
-						ModelMatrixVengador = glm::translate(ModelMatrixVengador, glm::vec3(0.0 - Vengador.BanderaPos1 * 6.2, 0.0, 0.0 - (dado - Vengador.BanderaPos1) * 6.2));
-						Vengador.BanderaPos1 = 0;
-					}
-					else if (Vengador.BanderaPos1 < 1)
-					{
-						ModelMatrixVengador = glm::translate(ModelMatrixVengador, glm::vec3(0.0, 0.0, 0.0 - (dado) * 6.2));
-						Vengador.BanderaPos2 = 13 - Vengador.PossTablero;
-					}
+					ModelMatrixVengador = glm::translate(ModelMatrixVengador, glm::vec3(0.0, 0.0, 0.0 - (dado) * 6.2));
+					Vengador.BanderaPos2 = 13 - Vengador.PossTablero;
 				}
-				else if (Vengador.PossTablero > 13 && Vengador.PossTablero < 21)
+			}
+			else if (Vengador.PossTablero > 13 && Vengador.PossTablero < 21)
+			{
+				if (Vengador.BanderaPos2 > 0)
 				{
-					if (Vengador.BanderaPos2 > 0)
-					{
-						ModelMatrixVengador = glm::translate(ModelMatrixVengador, glm::vec3(0.0 + (dado - Vengador.BanderaPos2) * 6.2, 0.0, 0.0 - Vengador.BanderaPos2 * 6.2));
-						Caballero.BanderaPos2 = 0;
-					}
-					else if (Vengador.BanderaPos2 < 1)
-					{
-						ModelMatrixVengador = glm::translate(ModelMatrixVengador, glm::vec3(0.0 + (dado) * 6.2, 0.0, 0.0));
-						Vengador.BanderaPos3 = 20 - Vengador.PossTablero;
-					}
+					ModelMatrixVengador = glm::translate(ModelMatrixVengador, glm::vec3(0.0 + (dado - Vengador.BanderaPos2) * 6.2, 0.0, 0.0 - Vengador.BanderaPos2 * 6.2));
+					Caballero.BanderaPos2 = 0;
 				}
-				else if (Vengador.PossTablero > 20 && Vengador.PossTablero < 28)
+				else if (Vengador.BanderaPos2 < 1)
 				{
-					if (Vengador.BanderaPos3 > 0)
-					{
-						ModelMatrixVengador = glm::translate(ModelMatrixVengador, glm::vec3(0.0 + Vengador.BanderaPos3 * 6.2, 0.0, 0.0 + (dado - Vengador.BanderaPos3) * 6.2));
-						Vengador.BanderaPos3 = 0;
-					}
-					else if (Vengador.BanderaPos3 < 1)
-					{
-						ModelMatrixVengador = glm::translate(ModelMatrixVengador, glm::vec3(0.0, 0.0, 0.0 + (dado) * 6.2));
-						Vengador.BanderaPos4 = 27 - Vengador.PossTablero;
-					}
+					ModelMatrixVengador = glm::translate(ModelMatrixVengador, glm::vec3(0.0 + (dado) * 6.2, 0.0, 0.0));
+					Vengador.BanderaPos3 = 20 - Vengador.PossTablero;
 				}
-				else if (Vengador.PossTablero > 27)
+			}
+			else if (Vengador.PossTablero > 20 && Vengador.PossTablero < 28)
+			{
+				if (Vengador.BanderaPos3 > 0)
 				{
-					if (Vengador.BanderaPos4 > 0)
-					{
+					ModelMatrixVengador = glm::translate(ModelMatrixVengador, glm::vec3(0.0 + Vengador.BanderaPos3 * 6.2, 0.0, 0.0 + (dado - Vengador.BanderaPos3) * 6.2));
+					Vengador.BanderaPos3 = 0;
+				}
+				else if (Vengador.BanderaPos3 < 1)
+				{
+					ModelMatrixVengador = glm::translate(ModelMatrixVengador, glm::vec3(0.0, 0.0, 0.0 + (dado) * 6.2));
+					Vengador.BanderaPos4 = 27 - Vengador.PossTablero;
+				}
+			}
+			else if (Vengador.PossTablero > 27)
+			{
+				if (Vengador.BanderaPos4 > 0)
+				{
 
-						ModelMatrixVengador = glm::translate(ModelMatrixVengador, glm::vec3(0.0 + Vengador.BanderaPos4 * 6.2, 0.0, 0.0 - 6.2));
-						Vengador.PossTablero = 0;
-						Vengador.BanderaPos4 = 0;
-					}
+					ModelMatrixVengador = glm::translate(ModelMatrixVengador, glm::vec3(0.0 + Vengador.BanderaPos4 * 6.2, 0.0, 0.0 - 6.2));
+					Vengador.PossTablero = 0;
+					Vengador.BanderaPos4 = 0;
 				}
-				//------------------------Fin Movimienots-----------------------------------------------
+			}
+			//------------------------Fin Movimienots-----------------------------------------------
 			printf("Entro a accion 2 del vengador y su ataque es %d\n", Vengador.ataque);
 			printf("Entro a accion 2 del vengador y su defensa es %d\n", Vengador.defensa);
 			printf("Entro a accion 2 del vengador y su vida es %d\n", Vengador.vida);
@@ -2315,10 +2325,20 @@ bool processInput(bool continueApplication)
 		if (VengadorSelected && Vengador.vida <= 0)
 		{
 			Vengador = TiradaDeSalvacion(Vengador);
+			VengadorSelected = false;
 		}
 	}
 	//--------------------------------------------------------
-
+	// Cambiar tipo de camara
+	//if (enable_camera && glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS)
+//	{
+//		cameraState = "libre";
+//		enable_camera = false;
+//	}
+//	if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_K) == GLFW_RELEASE)
+//	{
+//		enable_camera = true;
+//	}
 	glfwPollEvents();
 	return continueApplication;
 }
@@ -2398,24 +2418,51 @@ void renderSolidScene()
 	}
 
 	// Models Huesos
+
 	glm::mat4 renderMatrixCazador = glm::mat4(ModelMatrixCazador);
 	renderMatrixCazador = glm::scale(renderMatrixCazador, glm::vec3(0.02f, 0.02f, 0.02f));
+	glm::vec3 ejey = glm::normalize(terrain.getNormalTerrain(ModelMatrixCazador[3][0], ModelMatrixCazador[3][2]));
+	glm::vec3 ejex = glm::vec3(ModelMatrixCazador[0]);
+	glm::vec3 ejez = glm::normalize(glm::cross(ejex, ejey));
+	ejex = glm::normalize(glm::cross(ejey, ejez));
+	ModelMatrixCazador[0] = glm::vec4(ejex, 0.0);
+	ModelMatrixCazador[1] = glm::vec4(ejey, 0.0);
+	ModelMatrixCazador[2] = glm::vec4(ejez, 0.0);
+	ModelMatrixCazador[3][1] = terrain.getHeightTerrain(ModelMatrixCazador[3][0], ModelMatrixCazador[3][2]);
 	ModelCazador.setAnimationIndex(1);
 	ModelCazador.render(renderMatrixCazador);
 
 	glm::mat4 renderMatrixSanador = glm::mat4(ModelMatrixSanador);
 	renderMatrixSanador = glm::scale(renderMatrixSanador, glm::vec3(0.02f, 0.02f, 0.02f));
-	ModelSanador.setAnimationIndex(1);
+	//glm::vec3 ejey = glm::normalize(terrain.getNormalTerrain(ModelMatrixSanador[3][0], ModelMatrixSanador[3][2]));
+	//glm::vec3 ejex = glm::vec3(ModelMatrixSanador[0]);
+	//glm::vec3 ejez = glm::normalize(glm::cross(ejex, ejey));
+	ejex = glm::normalize(glm::cross(ejey, ejez));
+	ModelMatrixSanador[0] = glm::vec4(ejex, 0.0);
+	ModelMatrixSanador[1] = glm::vec4(ejey, 0.0);
+	ModelMatrixSanador[2] = glm::vec4(ejez, 0.0);
+	ModelMatrixSanador[3][1] = terrain.getHeightTerrain(ModelMatrixSanador[3][0], ModelMatrixSanador[3][2]);
+	ModelSanador.setAnimationIndex(0);
 	ModelSanador.render(renderMatrixSanador);
 
 	glm::mat4 renderMatrixCaballero = glm::mat4(ModelMatrixCaballero);
 	renderMatrixCaballero = glm::scale(renderMatrixCaballero, glm::vec3(0.02f, 0.02f, 0.02f));
-	ModelCaballero.setAnimationIndex(1);
+	ejex = glm::normalize(glm::cross(ejey, ejez));
+	ModelMatrixCaballero[0] = glm::vec4(ejex, 0.0);
+	ModelMatrixCaballero[1] = glm::vec4(ejey, 0.0);
+	ModelMatrixCaballero[2] = glm::vec4(ejez, 0.0);
+	ModelMatrixCaballero[3][1] = terrain.getHeightTerrain(ModelMatrixCaballero[3][0], ModelMatrixCaballero[3][2]);
+	ModelCaballero.setAnimationIndex(0);
 	ModelCaballero.render(renderMatrixCaballero);
 
 	glm::mat4 renderMatrixVengador = glm::mat4(ModelMatrixVengador);
 	renderMatrixVengador = glm::scale(renderMatrixVengador, glm::vec3(0.02f, 0.02f, 0.02f));
-	ModelVengador.setAnimationIndex(1);
+	ejex = glm::normalize(glm::cross(ejey, ejez));
+	ModelMatrixVengador[0] = glm::vec4(ejex, 0.0);
+	ModelMatrixVengador[1] = glm::vec4(ejey, 0.0);
+	ModelMatrixVengador[2] = glm::vec4(ejez, 0.0);
+	ModelMatrixVengador[3][1] = terrain.getHeightTerrain(ModelMatrixVengador[3][0], ModelMatrixVengador[3][2]);
+	ModelVengador.setAnimationIndex(0);
 	ModelVengador.render(renderMatrixVengador);
 
 	/*******************************************
@@ -2589,7 +2636,35 @@ void applicationLoop()
 		// ****************************************************************
 		// applicationLoop(), while(psi): CÁMARAS
 		// ****************************************************************
-		view = camera1P->getViewMatrix();
+		// pruebas camara
+		if (modelSelected == 1)
+		{
+			target = ModelMatrixCazador[3];
+			angleTarget = glm::angle(glm::quat_cast(ModelMatrixCazador));
+			axis = glm::axis(glm::quat_cast(ModelMatrixCazador));
+		}
+		else if (modelSelected == 2)
+		{
+			target = ModelMatrixSanador[3];
+			angleTarget = glm::angle(glm::quat_cast(ModelMatrixSanador));
+			axis = glm::axis(glm::quat_cast(ModelMatrixSanador));
+		}
+		else if (modelSelected == 3)
+		{
+			target = ModelMatrixCaballero[3];
+			angleTarget = glm::angle(glm::quat_cast(ModelMatrixCaballero));
+			axis = glm::axis(glm::quat_cast(ModelMatrixCaballero));
+		}
+		else if (modelSelected == 4)
+		{
+			target = ModelMatrixVengador[3];
+			angleTarget = glm::angle(glm::quat_cast(ModelMatrixVengador));
+			axis = glm::axis(glm::quat_cast(ModelMatrixVengador));
+		}
+		camera3P->setAngleTarget(angleTarget);
+		camera3P->setCameraTarget(target);
+		camera3P->updateCamera();
+		view = camera3P->getViewMatrix();
 
 		shadowBox->update(screenWidth, screenHeight);
 		glm::vec3 centerBox = shadowBox->getCenter();
