@@ -883,9 +883,11 @@ void init(int width, int height, std::string strTitle, bool bFullScreen)
 	// Inicialización de los shaders
 	shader.initialize("../shaders/colorShader.vs", "../shaders/colorShader.fs");
 	shaderSkybox.initialize("../shaders/skyBox.vs", "../shaders/skyBox_fog.fs");
-	shaderMulLighting.initialize("../shaders/iluminacion_textura_animation_shadow.vs", "../shaders/multipleLights_shadow.fs");
+	// shaderMulLighting.initialize("../shaders/iluminacion_textura_animation_shadow.vs", "../shaders/multipleLights_shadow.fs");
 	// shaderMulLighting.initialize("../Shaders/iluminacion_textura_animation.vs", "../Shaders/multipleLights.fs");
-	shaderTerrain.initialize("../shaders/terrain_shadow.vs", "../shaders/terrain_shadow.fs");
+	shaderMulLighting.initialize("../Shaders/iluminacion_textura_animation_fog.vs", "../Shaders/multipleLights_fog.fs");
+	shaderTerrain.initialize("../Shaders/terrain_fog.vs", "../Shaders/terrain_fog.fs");
+	// shaderTerrain.initialize("../shaders/terrain_shadow.vs", "../shaders/terrain_shadow.fs");
 	shaderTexture.initialize("../shaders/texturizado.vs", "../shaders/texturizado.fs");
 	shaderViewDepth.initialize("../shaders/texturizado.vs", "../shaders/texturizado_depth_view.fs");
 	shaderDepth.initialize("../shaders/shadow_mapping_depth.vs", "../shaders/shadow_mapping_depth.fs");
@@ -2346,6 +2348,11 @@ void applicationLoop()
 		shaderMulLighting.setVectorFloat3("fogColor", glm::value_ptr(color_fog));
 		shaderTerrain.setVectorFloat3("fogColor", glm::value_ptr(color_fog));
 		shaderSkybox.setVectorFloat3("fogColor", glm::value_ptr(color_fog));
+		
+		shaderMulLighting.setFloat("density", 0.055);
+		shaderMulLighting.setFloat("gradient", 0.5);
+		shaderTerrain.setFloat("density", 0.055);
+		shaderTerrain.setFloat("gradient", 0.5);
 
 		/*******************************************
 		 * Propiedades Luz direccional
