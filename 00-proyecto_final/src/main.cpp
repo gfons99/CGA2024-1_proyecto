@@ -939,6 +939,7 @@ void init(int width, int height, std::string strTitle, bool bFullScreen)
 	model_cristal_verde.loadModel("../media/models/cristales/cristal_verde.obj");
 	model_cristal_verde.setShader(&shaderMulLighting);
 
+
 	// Terreno
 	terrain.init();
 	terrain.setShader(&shaderTerrain);
@@ -968,14 +969,14 @@ void init(int width, int height, std::string strTitle, bool bFullScreen)
 	ModelCaballero.setShader(&shaderMulLighting);
 	ModelVengador.loadModel("../media/models/Vengador/Vengador.fbx");
 	ModelVengador.setShader(&shaderMulLighting);
-	/*ModelEsqueleto.loadModel("../models/Cazador/CazadorDescanso.fbx");
+	ModelEsqueleto.loadModel("../media/models/Esqueleto/Esqueleto.fbx");
 	ModelEsqueleto.setShader(&shaderMulLighting);
-	ModelDemonio.loadModel("../models/Cazador/CazadorDescanso.fbx");
+	ModelDemonio.loadModel("../media/models/Demonio/Demonio.fbx");
 	ModelDemonio.setShader(&shaderMulLighting);
-	ModelHechicero.loadModel("../models/Cazador/CazadorDescanso.fbx");
+	ModelHechicero.loadModel("../media/models/Hechicero/Hechicero.fbx");
 	ModelHechicero.setShader(&shaderMulLighting);
-	ModelAnfiteres.loadModel("../models/Cazador/CazadorDescanso.fbx");
-	ModelAnfiteres.setShader(&shaderMulLighting);*/
+	ModelAnfiteres.loadModel("../media/models/Dragon/Dragon.fbx");
+	ModelAnfiteres.setShader(&shaderMulLighting);
 
 	//*******************************************************************+
 
@@ -1964,7 +1965,7 @@ bool processInput(bool continueApplication)
 			Vengador = TiradaDeSalvacion(Vengador);
 			VengadorSelected = false;
 		}
-		printf("vida del jefe %d\n",Anfiteres.vida);
+		 
 	}
 	//--------------------------------------------------------
 	// Cambiar tipo de camara
@@ -2100,6 +2101,48 @@ void renderSolidScene()
 	ModelVengador.setAnimationIndex(0);
 	ModelVengador.render(renderMatrixVengador);
 
+	glm::mat4 renderMatrixAnfiteres = glm::mat4(ModelMatrixAnfiteres);
+	renderMatrixAnfiteres = glm::scale(renderMatrixAnfiteres, glm::vec3(5.0f, 5.0f, 5.0f));
+	ejex = glm::normalize(glm::cross(ejey, ejez));
+	ModelMatrixAnfiteres[0] = glm::vec4(ejex, 0.0);
+	ModelMatrixAnfiteres[1] = glm::vec4(ejey, 0.0);
+	ModelMatrixAnfiteres[2] = glm::vec4(ejez, 0.0);
+	ModelMatrixAnfiteres[3][1] = terrain.getHeightTerrain(ModelMatrixAnfiteres[3][0], ModelMatrixAnfiteres[3][2]);
+	ModelAnfiteres.setAnimationIndex(1);
+	ModelAnfiteres.render(renderMatrixAnfiteres);
+
+	glm::mat4 renderMatrixEsqueleto = glm::mat4(ModelMatrixEsqueleto);
+	renderMatrixEsqueleto = glm::scale(renderMatrixEsqueleto, glm::vec3(0.1f, 0.1f, 0.1f));
+	renderMatrixEsqueleto = glm::rotate(renderMatrixEsqueleto,glm::radians(90.0f),glm::vec3(-1.0f, 0.0f, 0.0f));
+	ejex = glm::normalize(glm::cross(ejey, ejez));
+	ModelMatrixEsqueleto[0] = glm::vec4(ejex, 0.0);
+	ModelMatrixEsqueleto[1] = glm::vec4(ejey, 0.0);
+	ModelMatrixEsqueleto[2] = glm::vec4(ejez, 0.0);
+	ModelMatrixEsqueleto[3][1] = terrain.getHeightTerrain(ModelMatrixEsqueleto[3][0], ModelMatrixEsqueleto[3][2]);
+	ModelEsqueleto.render(renderMatrixEsqueleto);
+	
+	glm::mat4 renderMatrixDemonio = glm::mat4(ModelMatrixDemonio);
+	renderMatrixDemonio = glm::scale(renderMatrixDemonio, glm::vec3(0.2f, 0.2f, 0.2f));
+	//renderMatrixDemonio = glm::rotate(renderMatrixDemonio,glm::radians(90.0f),glm::vec3(-1.0f, 0.0f, 0.0f));
+	ejex = glm::normalize(glm::cross(ejey, ejez));
+	ModelMatrixDemonio[0] = glm::vec4(ejex, 0.0);
+	ModelMatrixDemonio[1] = glm::vec4(ejey, 0.0);
+	ModelMatrixDemonio[2] = glm::vec4(ejez, 0.0);
+	ModelMatrixDemonio[3][1] = terrain.getHeightTerrain(ModelMatrixDemonio[3][0], ModelMatrixDemonio[3][2]);
+	ModelDemonio.render(renderMatrixDemonio);
+	
+	glm::mat4 renderMatrixHechicero = glm::mat4(ModelMatrixHechicero);
+	renderMatrixHechicero = glm::scale(renderMatrixHechicero, glm::vec3(0.01f, 0.01f, 0.01f));
+	//renderMatrixHechicero = glm::rotate(renderMatrixHechicero,glm::radians(90.0f),glm::vec3(-1.0f, 0.0f, 0.0f));
+	ejex = glm::normalize(glm::cross(ejey, ejez));
+	ModelMatrixHechicero[0] = glm::vec4(ejex, 0.0);
+	ModelMatrixHechicero[1] = glm::vec4(ejey, 0.0);
+	ModelMatrixHechicero[2] = glm::vec4(ejez, 0.0);
+	ModelMatrixHechicero[3][1] = terrain.getHeightTerrain(ModelMatrixHechicero[3][0], ModelMatrixHechicero[3][2]);
+	ModelHechicero.render(renderMatrixHechicero);
+	
+	
+
 	/*******************************************
 	 * Skybox
 	 *******************************************/
@@ -2230,6 +2273,14 @@ void applicationLoop()
 	ModelMatrixCazador = glm::translate(ModelMatrixCazador, glm::vec3(16.625, 0.0, 20.885));
 
 	ModelMatrixSanador = glm::translate(ModelMatrixSanador, glm::vec3(14.625, 0.0, 20.885));
+
+	ModelMatrixAnfiteres = glm::translate(ModelMatrixAnfiteres, glm::vec3(0.0, 0.0, 0.0));
+
+	ModelMatrixEsqueleto = glm::translate(ModelMatrixEsqueleto, glm::vec3(5.0, 0.0, 0.0));
+
+	ModelMatrixEsqueleto = glm::translate(ModelMatrixDemonio, glm::vec3(0.0, 0.0, 0.5));
+
+	ModelMatrixEsqueleto = glm::translate(ModelMatrixHechicero, glm::vec3(0.5, 0.0, 0.0));
 
 	// Variables to interpolation key frames
 	// ***
