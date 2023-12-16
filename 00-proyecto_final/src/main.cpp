@@ -64,12 +64,24 @@ float cursor_x = -0.5460;
 float cursor_y = 0.8330;
 
 char CadenaVidaCazador[3];
+char CadenaDefCazador[3];
+char CadenaAtqCazador[3];
+char CadenaCDCazador[3];
 
 char CadenaVidaSanador[3];
+char CadenaDefSanador[3];
+char CadenaAtqSanador[3];
+char CadenaCDSanador[3];
 
 char CadenaVidaCaballero[3];
+char CadenaDefCaballero[3];
+char CadenaAtqCaballero[3];
+char CadenaCDCaballero[3];
 
 char CadenaVidaVengador[3];
+char CadenaDefVengador[3];
+char CadenaAtqVengador[3];
+char CadenaCDVengador[3];
 
 const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
 
@@ -160,6 +172,7 @@ bool en_pantalla_de_juego = false;
 bool ena_key_enter = true, ena_key_left = true, ena_key_right = true;
 bool ena_key_up = true, ena_key_down = true;
 bool ena_key_z = true, ena_key_x = true, ena_key_c = true;
+bool se_eligio_tirada = false, se_eligio_habilidad = false;
 
 // Modelo para el render del texto
 FontTypeRendering::FontTypeRendering *modelText;
@@ -208,7 +221,7 @@ glm::mat4 ModelMatrixAnfiteres = glm::mat4(1.0f);
 // ****************************************************************
 // VARIABLES DE ANIMACIÓN
 // ****************************************************************
-int modelSelected = 0;
+int modelSelected = 1;
 bool enableCountSelected = true;
 bool enableTirada = false;
 bool CazadorSelected = true;
@@ -282,8 +295,8 @@ struct Personaje inicializarPersonaje(int tipo_personaje)
 		// personaje.movimiento = 6;
 		personaje.PossTablero = 0;
 		personaje.TiradaSalvacion = 3;
-		personaje.CD = 4;
-		personaje.CDMX = 4;
+		personaje.CD = 6;
+		personaje.CDMX = 6;
 		personaje.BanderaPos1 = 0;
 		personaje.BanderaPos2 = 0;
 		personaje.BanderaPos3 = 0;
@@ -1615,8 +1628,10 @@ bool processInput(bool continueApplication)
 		{
 			if (ena_key_enter && glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS)
 			{
-				txs_active = txs_gameplay_ui_00;
+				// txs_active = txs_gameplay_ui_00;
 				alSourcePlay(al_sources[1]);
+				se_eligio_tirada = true;
+				ena_key_enter = false;
 			}
 			else if (ena_key_down && glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
 			{
@@ -1629,8 +1644,10 @@ bool processInput(bool continueApplication)
 		{
 			if (ena_key_enter && glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS)
 			{
-				txs_active = txs_gameplay_ui_00;
+				// txs_active = txs_gameplay_ui_00;
 				alSourcePlay(al_sources[1]);
+				se_eligio_habilidad = true;
+				ena_key_enter = false;
 			}
 			else if (ena_key_up && glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
 			{
@@ -1807,15 +1824,17 @@ bool processInput(bool continueApplication)
 	}
 
 	//--------------------------------------------------------
-	if (modelSelected == 1 && enableTirada)
+	// if (modelSelected == 1 && enableTirada)
+	if (modelSelected == 1)
 	{
 
 		// tirada de salvacion antes de realizar su acciones
 		if (CazadorSelected && Cazador.vida > 0)
 		{
-			if (CazadorSelected && glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+			// if (CazadorSelected && glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+			if (CazadorSelected && se_eligio_tirada)
 			{ // tira el dado y avanza
-
+				se_eligio_tirada = false;
 				CazadorSelected = false;
 
 				int dado = 1 + rand() % 6;
@@ -1844,8 +1863,10 @@ bool processInput(bool continueApplication)
 				printf("Habilidad en CD Tira el Dado (Accion 1) CD %d / %d\n", Cazador.CD, Cazador.CDMX);
 			}
 
-			if (CazadorSelected && glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+			// if (CazadorSelected && glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+			if (CazadorSelected && se_eligio_habilidad)
 			{ // diplica su dañao y avanza
+				se_eligio_habilidad = false;
 				if (Cazador.CD == Cazador.CDMX)
 				{
 					Cazador.ataque = Cazador.ataque * 2;
@@ -1876,22 +1897,21 @@ bool processInput(bool continueApplication)
 
 					Cazador.CD = 0;
 					CazadorSelected = false;
-				}
-				else
-				{
 					printf("Habilidad en CD Tira el Dado (Accion 1) CD %d / %d\n", Cazador.CD, Cazador.CDMX);
 				}
 			}
 		}
 		else if (CazadorSelected && Cazador.vida <= 0)
 		{
+			printf("TIRADA DE SALVACION");
 			Cazador = TiradaDeSalvacion(Cazador);
-
 			CazadorSelected = false;
+			modelSelected++;
 		}
 	}
 
-	if (modelSelected == 2 && enableTirada)
+	// if (modelSelected == 2 && enableTirada)
+	if (modelSelected == 2)
 	{
 
 		// tirada de salvacion antes de realizar su acciones
@@ -1899,8 +1919,10 @@ bool processInput(bool continueApplication)
 		if (SanadorSelected && Sanador.vida > 0)
 		{
 
-			if (SanadorSelected && glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
+			// if (SanadorSelected && glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
+			if (SanadorSelected && se_eligio_tirada)
 			{ // tira el dado y avanza
+				se_eligio_tirada = false;
 				SanadorSelected = false;
 				int dado = 1 + rand() % 6;
 				GeneradorMs = MostruosGenerdor(GeneradorMs);
@@ -1922,33 +1944,33 @@ bool processInput(bool continueApplication)
 
 				printf("Habilidad en CD Tira el Dado (Accion 1) CD %d / %d\n", Sanador.CD, Sanador.CDMX);
 			}
-			if (SanadorSelected && glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
+			// if (SanadorSelected && glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
+			if (SanadorSelected && se_eligio_habilidad)
 			{
-				SanadorSelected = false;
+				se_eligio_habilidad = false;
+
 				if (Sanador.CD == Sanador.CDMX)
 				{
-					if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS)
-					{
-						Cazador.vida = Cazador.vidaMx;
-					}
-					if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS)
-					{
-						Caballero.vida = Caballero.vidaMx;
-					}
-					if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS)
-					{
-						Vengador.vida = Vengador.vidaMx;
-					}
+
+					Cazador.vida = Cazador.vidaMx;
+
+					Caballero.vida = Caballero.vidaMx;
+
+					Vengador.vida = Vengador.vidaMx;
+
 					int dado = 1 + rand() % 6;
 					GeneradorMs = MostruosGenerdor(GeneradorMs);
 					Tipo_Casilla = keyTablero(Sanador.PossTablero + dado);
 					Tablero(&Sanador, dado, &GeneradorMs, &Anfiteres, Tipo_Casilla);
+
 					if (Tipo_Casilla == 1)
 					{
 						PerderBuffo(buffo, &Sanador);
 					}
+
 					//----------------------Movimientos-------------------------------------
 					ModelMatrixSanador = Movimiento(&Sanador, dado, ModelMatrixSanador);
+
 					//------------------------Fin Movimienots-----------------------------------------------
 					printf("Entro a accion 2 del sanador y su ataque es %d\n", Sanador.ataque);
 					printf("Entro a accion 2 del sanador y su defensa es %d\n", Sanador.defensa);
@@ -1956,27 +1978,29 @@ bool processInput(bool continueApplication)
 					printf("Entro a accion 2 del sanador y su poss es %d\n", Sanador.PossTablero);
 					Sanador.CD = 0;
 					SanadorSelected = false;
-				}
-				else
-				{
 					printf("Habilidad en CD Tira el Dado (Accion 1) CD %d / %d\n", Sanador.CD, Sanador.CDMX);
 				}
 			}
 		}
 		if (SanadorSelected && Sanador.vida <= 0)
 		{
+			printf("TIRADA DE SALVACION");
 			Sanador = TiradaDeSalvacion(Sanador);
 			SanadorSelected = false;
+			modelSelected++;
 		}
 	}
 
-	if (modelSelected == 3 && enableTirada)
+	// if (modelSelected == 3 && enableTirada)
+	if (modelSelected == 3)
 	{
 		if (CaballeroSelected && Caballero.vida > 0)
 		{
 
-			if (CaballeroSelected && glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS)
+			// if (CaballeroSelected && glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS)
+			if (CaballeroSelected && se_eligio_tirada)
 			{ // tira el dado y avanza
+				se_eligio_tirada = false;
 				CaballeroSelected = false;
 				int dado = 1 + rand() % 6;
 				GeneradorMs = MostruosGenerdor(GeneradorMs);
@@ -1993,11 +2017,11 @@ bool processInput(bool continueApplication)
 				printf("Entro a accion 1 del caballero y su defensa es %d\n", Caballero.defensa);
 				printf("Entro a accion 1 del caballero y su vida es %d\n", Caballero.vida);
 				printf("Entro a accion 1 del caballero y su poss es %d\n", Caballero.PossTablero);
-
-				printf("Habilidad en CD Tira el Dado (Accion 1) CD %d / %d\n", Caballero.CD, Caballero.CDMX);
 			}
-			if (CaballeroSelected && glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS)
+			// if (CaballeroSelected && glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS)
+			if (CaballeroSelected && se_eligio_habilidad)
 			{ // diplica su dañao y avanza
+				se_eligio_habilidad = false;
 
 				if (Caballero.CD == Caballero.CDMX)
 				{
@@ -2018,30 +2042,33 @@ bool processInput(bool continueApplication)
 					printf("Entro a accion 2 del caballero y su defensa es %d\n", Caballero.defensa);
 					printf("Entro a accion 2 del caballero y su vida es %d\n", Caballero.vida);
 					printf("Entro a accion 2 del caballero y su poss es %d\n", Caballero.PossTablero);
-					CaballeroSelected = false;
 					Caballero.CD = 0;
+					CaballeroSelected = false;
 				}
-				else
-				{
-					printf("Habilidad en CD Tira el Dado (Accion 1) CD %d / %d\n", Caballero.CD, Caballero.CDMX);
-				}
+
+				printf("Habilidad en CD Tira el Dado (Accion 1) CD %d / %d\n", Caballero.CD, Caballero.CDMX);
 			}
 		}
 		if (CaballeroSelected && Caballero.vida <= 0)
 		{
+			printf("TIRADA DE SALVACION");
 			Caballero = TiradaDeSalvacion(Caballero);
 			CaballeroSelected = false;
+			modelSelected++;
 		}
 	}
 
-	if (modelSelected == 4 && enableTirada)
+	// if (modelSelected == 4 && enableTirada)
+	if (modelSelected == 4)
 	{
+		// if (VengadorSelected && glfwGetKey(window, GLFW_KEY_7) == GLFW_PRESS)
 		if (VengadorSelected && Vengador.vida > 0)
-		{
-			if (VengadorSelected && glfwGetKey(window, GLFW_KEY_7) == GLFW_PRESS)
-			{ // tira el dado y avanza
+		{ // tira el dado y avanza
+			if (VengadorSelected && se_eligio_tirada)
+			{
+				se_eligio_tirada = false;
 				VengadorSelected = false;
-				int dado = 1 + rand() % 5;
+				int dado = 1 + rand() % 6;
 				MostruosGenerdor(GeneradorMs);
 				Tipo_Casilla = keyTablero(Vengador.PossTablero + dado);
 				Tablero(&Vengador, dado, &GeneradorMs, &Anfiteres, Tipo_Casilla);
@@ -2056,15 +2083,15 @@ bool processInput(bool continueApplication)
 				printf("Entro a accion 1 del vengador y su defensa es %d\n", Vengador.defensa);
 				printf("Entro a accion 1 del vengador y su vida es %d\n", Vengador.vida);
 				printf("Entro a accion 1 del vengador y su poss es %d\n", Vengador.PossTablero);
-				printf("Habilidad en CD Tira el Dado (Accion 1) CD %d / %d\n", Vengador.CD, Vengador.CDMX);
 			}
-			if (VengadorSelected && glfwGetKey(window, GLFW_KEY_8) == GLFW_PRESS)
+			// if (VengadorSelected && glfwGetKey(window, GLFW_KEY_8) == GLFW_PRESS)
+			if (VengadorSelected && se_eligio_habilidad)
 			{ // diplica su dañao y avanza .
-
+				se_eligio_habilidad = false;
 				if (Vengador.CD == Vengador.CDMX)
 				{
 					Vengador.ataque = Vengador.ataque + (10 - Vengador.vida);
-					int dado = 1 + rand() % 5;
+					int dado = 1 + rand() % 6;
 					MostruosGenerdor(GeneradorMs);
 					Tipo_Casilla = keyTablero(Vengador.PossTablero + dado);
 					Tablero(&Vengador, dado, &GeneradorMs, &Anfiteres, Tipo_Casilla);
@@ -2079,35 +2106,23 @@ bool processInput(bool continueApplication)
 					printf("Entro a accion 2 del vengador y su defensa es %d\n", Vengador.defensa);
 					printf("Entro a accion 2 del vengador y su vida es %d\n", Vengador.vida);
 					printf("Entro a accion 2 del vengador y su poss es %d\n", Vengador.PossTablero);
-					VengadorSelected = false;
 					Vengador.CD = 0;
-				}
-				else
-				{
-					printf("Habilidad en CD Tira el Dado (Accion 1) CD %d / %d\n", Vengador.CD, Vengador.CDMX);
+					VengadorSelected = false;
 				}
 
-				if (VengadorSelected && Vengador.vida <= 0)
-				{
-					Vengador = TiradaDeSalvacion(Vengador);
-					VengadorSelected = false;
-				}
+				printf("Habilidad en CD Tira el Dado (Accion 1) CD %d / %d\n", Vengador.CD, Vengador.CDMX);
 			}
-			printf("vida del jefe %d\n", Anfiteres.vida);
+			
 		}
+		if (VengadorSelected && Vengador.vida <= 0)
+			{
+				printf("TIRADA DE SALVACION");
+				Vengador = TiradaDeSalvacion(Vengador);
+				VengadorSelected = false;
+				modelSelected=1;
+			}
 	}
 
-	//--------------------------------------------------------
-	// Cambiar tipo de camara
-	// if (enable_camera && glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS)
-	//	{
-	//		cameraState = "libre";
-	//		enable_camera = false;
-	//	}
-	//	if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_K) == GLFW_RELEASE)
-	//	{
-	//		enable_camera = true;
-	//	}
 	glfwPollEvents();
 	return continueApplication;
 }
@@ -2333,7 +2348,10 @@ void renderAlphaScene(bool render = true)
 
 		sprintf(CadenaVidaCazador, "%d/6", Cazador.vida);
 		modelText->render(CadenaVidaCazador, -0.5460, 0.8330);
-		
+
+		sprintf(CadenaVidaCazador, "%d/6", Cazador.vida);
+		modelText->render(CadenaVidaCazador, -0.5460, 0.6330);
+
 		sprintf(CadenaVidaCazador, "%d/6", Cazador.vida);
 		modelText->render(CadenaVidaCazador, -0.5460, 0.6330);
 
