@@ -2661,8 +2661,8 @@ void applicationLoop()
 		 *******************************************/
 		// Usamos size() para determinar el número de lámparas que tenemos
 		int pointLights_num = poss_cristal_amarillo.size() + poss_cristal_azul.size() + poss_cristal_rojo.size() + poss_cristal_verde.size();
-		// shaderMulLighting.setInt("pointLightCount", 1);
-		// shaderTerrain.setInt("pointLightCount", 1);
+		shaderMulLighting.setInt("pointLightCount", 1);
+		shaderTerrain.setInt("pointLightCount", 1);
 
 		// cristal_amarillo
 		for (int i = 0; i < poss_cristal_amarillo.size(); i++)
