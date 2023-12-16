@@ -160,6 +160,7 @@ bool en_pantalla_de_juego = false;
 bool ena_key_enter = true, ena_key_left = true, ena_key_right = true;
 bool ena_key_up = true, ena_key_down = true;
 bool ena_key_z = true, ena_key_x = true, ena_key_c = true;
+bool se_eligio_tirada = false, se_eligio_habilidad = false;
 
 // Modelo para el render del texto
 FontTypeRendering::FontTypeRendering *modelText;
@@ -945,7 +946,6 @@ void init(int width, int height, std::string strTitle, bool bFullScreen)
 	model_cristal_verde.loadModel("../media/models/cristales/cristal_verde.obj");
 	model_cristal_verde.setShader(&shaderMulLighting);
 
-
 	// Terreno
 	terrain.init();
 	terrain.setShader(&shaderTerrain);
@@ -1191,7 +1191,7 @@ void init(int width, int height, std::string strTitle, bool bFullScreen)
 
 	// Definiendo la textura
 	Texture textureScreen00("../media/textures_screen/gameplay_00.PNG");
-	textureScreen00.loadImage();										  // Cargar la textura
+	textureScreen00.loadImage();									  // Cargar la textura
 	glGenTextures(1, &txs_gameplay_ui_00);							  // Creando el id de la textura del landingpad
 	glBindTexture(GL_TEXTURE_2D, txs_gameplay_ui_00);				  // Se enlaza la textura
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	  // Wrapping en el eje u
@@ -1211,7 +1211,7 @@ void init(int width, int height, std::string strTitle, bool bFullScreen)
 
 	// Definiendo la textura
 	Texture textureScreen01("../media/textures_screen/gameplay_01.PNG");
-	textureScreen01.loadImage();										  // Cargar la textura
+	textureScreen01.loadImage();									  // Cargar la textura
 	glGenTextures(1, &txs_gameplay_ui_01);							  // Creando el id de la textura del landingpad
 	glBindTexture(GL_TEXTURE_2D, txs_gameplay_ui_01);				  // Se enlaza la textura
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	  // Wrapping en el eje u
@@ -1228,10 +1228,10 @@ void init(int width, int height, std::string strTitle, bool bFullScreen)
 	else
 		std::cout << "Fallo la carga de textura" << std::endl;
 	textureScreen01.freeImage(); // Liberamos memoria
-	
+
 	// Definiendo la textura
 	Texture textureScreen02("../media/textures_screen/gameplay_02.PNG");
-	textureScreen02.loadImage();										  // Cargar la textura
+	textureScreen02.loadImage();									  // Cargar la textura
 	glGenTextures(1, &txs_gameplay_ui_02);							  // Creando el id de la textura del landingpad
 	glBindTexture(GL_TEXTURE_2D, txs_gameplay_ui_02);				  // Se enlaza la textura
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	  // Wrapping en el eje u
@@ -1616,8 +1616,9 @@ bool processInput(bool continueApplication)
 		{
 			if (ena_key_enter && glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS)
 			{
-				txs_active = txs_gameplay_ui_00;
+				// txs_active = txs_gameplay_ui_00;
 				alSourcePlay(al_sources[1]);
+				se_eligio_tirada = true;
 			}
 			else if (ena_key_down && glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
 			{
@@ -1630,8 +1631,9 @@ bool processInput(bool continueApplication)
 		{
 			if (ena_key_enter && glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS)
 			{
-				txs_active = txs_gameplay_ui_00;
+				// txs_active = txs_gameplay_ui_00;
 				alSourcePlay(al_sources[1]);
+				se_eligio_habilidad = true;
 			}
 			else if (ena_key_up && glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
 			{
@@ -1808,15 +1810,17 @@ bool processInput(bool continueApplication)
 	}
 
 	//--------------------------------------------------------
-	if (modelSelected == 1 && enableTirada)
+	// if (modelSelected == 1 && enableTirada)
+	if (modelSelected == 1)
 	{
 
 		// tirada de salvacion antes de realizar su acciones
 		if (CazadorSelected && Cazador.vida > 0)
 		{
-			if (CazadorSelected && glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+			// if (CazadorSelected && glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+			if (CazadorSelected && se_eligio_tirada)
 			{ // tira el dado y avanza
-
+				se_eligio_tirada = false;
 				CazadorSelected = false;
 
 				int dado = 1 + rand() % 6;
@@ -1845,8 +1849,10 @@ bool processInput(bool continueApplication)
 				printf("Habilidad en CD Tira el Dado (Accion 1) CD %d / %d\n", Cazador.CD, Cazador.CDMX);
 			}
 
-			if (CazadorSelected && glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+			// if (CazadorSelected && glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+			if (CazadorSelected && se_eligio_habilidad)
 			{ // diplica su dañao y avanza
+				se_eligio_habilidad = false;
 				if (Cazador.CD == Cazador.CDMX)
 				{
 					Cazador.ataque = Cazador.ataque * 2;
@@ -1887,12 +1893,13 @@ bool processInput(bool continueApplication)
 		else if (CazadorSelected && Cazador.vida <= 0)
 		{
 			Cazador = TiradaDeSalvacion(Cazador);
-
 			CazadorSelected = false;
+			printf("TIRADA DE SALVACION");
 		}
 	}
 
-	if (modelSelected == 2 && enableTirada)
+	// if (modelSelected == 2 && enableTirada)
+	if (modelSelected == 2)
 	{
 
 		// tirada de salvacion antes de realizar su acciones
@@ -1900,8 +1907,10 @@ bool processInput(bool continueApplication)
 		if (SanadorSelected && Sanador.vida > 0)
 		{
 
-			if (SanadorSelected && glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
+			// if (SanadorSelected && glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
+			if (SanadorSelected && se_eligio_tirada)
 			{ // tira el dado y avanza
+				se_eligio_tirada = false;
 				SanadorSelected = false;
 				int dado = 1 + rand() % 6;
 				GeneradorMs = MostruosGenerdor(GeneradorMs);
@@ -1923,8 +1932,10 @@ bool processInput(bool continueApplication)
 
 				printf("Entro a accion Ms vida %d\n", GeneradorMs.vida);
 			}
-			if (SanadorSelected && glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
+			// if (SanadorSelected && glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
+			if (SanadorSelected && se_eligio_habilidad)
 			{
+				se_eligio_habilidad = false;
 				SanadorSelected = false;
 				if (Sanador.CD == Sanador.CDMX)
 				{
@@ -1966,14 +1977,17 @@ bool processInput(bool continueApplication)
 			SanadorSelected = false;
 		}
 	}
-	
-	if (modelSelected == 3 && enableTirada)
+
+	// if (modelSelected == 3 && enableTirada)
+	if (modelSelected == 3)
 	{
 		if (CaballeroSelected && Caballero.vida > 0)
 		{
 
-			if (CaballeroSelected && glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS)
+			// if (CaballeroSelected && glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS)
+			if (CaballeroSelected && se_eligio_tirada)
 			{ // tira el dado y avanza
+				se_eligio_tirada = false;
 				CaballeroSelected = false;
 				int dado = 1 + rand() % 6;
 				GeneradorMs = MostruosGenerdor(GeneradorMs);
@@ -1991,8 +2005,10 @@ bool processInput(bool continueApplication)
 				printf("Entro a accion 1 del caballero y su vida es %d\n", Caballero.vida);
 				printf("Entro a accion 1 del caballero y su poss es %d\n", Caballero.PossTablero);
 			}
-			if (CaballeroSelected && glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS)
+			// if (CaballeroSelected && glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS)
+			if (CaballeroSelected && se_eligio_habilidad)
 			{ // diplica su dañao y avanza
+				se_eligio_habilidad = false;
 				CaballeroSelected = false;
 				Caballero.defensa = Caballero.defensa + 2;
 				int dado = 1 + rand() % 6;
@@ -2020,10 +2036,13 @@ bool processInput(bool continueApplication)
 		}
 	}
 
-	if (modelSelected == 4 && enableTirada)
+	// if (modelSelected == 4 && enableTirada)
+	if (modelSelected == 4)
 	{
-		if (VengadorSelected && glfwGetKey(window, GLFW_KEY_7) == GLFW_PRESS)
+		// if (VengadorSelected && glfwGetKey(window, GLFW_KEY_7) == GLFW_PRESS)
+		if (VengadorSelected && se_eligio_tirada)
 		{ // tira el dado y avanza
+			se_eligio_tirada = false;
 			VengadorSelected = false;
 			int dado = 1 + rand() % 5;
 			MostruosGenerdor(GeneradorMs);
@@ -2041,8 +2060,10 @@ bool processInput(bool continueApplication)
 			printf("Entro a accion 1 del vengador y su vida es %d\n", Vengador.vida);
 			printf("Entro a accion 1 del vengador y su poss es %d\n", Vengador.PossTablero);
 		}
-		if (VengadorSelected && glfwGetKey(window, GLFW_KEY_8) == GLFW_PRESS)
+		// if (VengadorSelected && glfwGetKey(window, GLFW_KEY_8) == GLFW_PRESS)
+		if (VengadorSelected && se_eligio_habilidad)
 		{ // diplica su dañao y avanza .
+			se_eligio_habilidad = false;
 			VengadorSelected = false;
 			Vengador.ataque = Vengador.ataque + (10 - Vengador.vida);
 			int dado = 1 + rand() % 5;
@@ -2068,8 +2089,7 @@ bool processInput(bool continueApplication)
 		}
 		printf("vida del jefe %d\n", Anfiteres.vida);
 	}
-	
-	
+
 	//--------------------------------------------------------
 	// Cambiar tipo de camara
 	// if (enable_camera && glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS)
@@ -2216,35 +2236,33 @@ void renderSolidScene()
 
 	glm::mat4 renderMatrixEsqueleto = glm::mat4(ModelMatrixEsqueleto);
 	renderMatrixEsqueleto = glm::scale(renderMatrixEsqueleto, glm::vec3(0.1f, 0.1f, 0.1f));
-	renderMatrixEsqueleto = glm::rotate(renderMatrixEsqueleto,glm::radians(90.0f),glm::vec3(-1.0f, 0.0f, 0.0f));
+	renderMatrixEsqueleto = glm::rotate(renderMatrixEsqueleto, glm::radians(90.0f), glm::vec3(-1.0f, 0.0f, 0.0f));
 	ejex = glm::normalize(glm::cross(ejey, ejez));
 	ModelMatrixEsqueleto[0] = glm::vec4(ejex, 0.0);
 	ModelMatrixEsqueleto[1] = glm::vec4(ejey, 0.0);
 	ModelMatrixEsqueleto[2] = glm::vec4(ejez, 0.0);
 	ModelMatrixEsqueleto[3][1] = terrain.getHeightTerrain(ModelMatrixEsqueleto[3][0], ModelMatrixEsqueleto[3][2]);
 	ModelEsqueleto.render(renderMatrixEsqueleto);
-	
+
 	glm::mat4 renderMatrixDemonio = glm::mat4(ModelMatrixDemonio);
 	renderMatrixDemonio = glm::scale(renderMatrixDemonio, glm::vec3(0.2f, 0.2f, 0.2f));
-	//renderMatrixDemonio = glm::rotate(renderMatrixDemonio,glm::radians(90.0f),glm::vec3(-1.0f, 0.0f, 0.0f));
+	// renderMatrixDemonio = glm::rotate(renderMatrixDemonio,glm::radians(90.0f),glm::vec3(-1.0f, 0.0f, 0.0f));
 	ejex = glm::normalize(glm::cross(ejey, ejez));
 	ModelMatrixDemonio[0] = glm::vec4(ejex, 0.0);
 	ModelMatrixDemonio[1] = glm::vec4(ejey, 0.0);
 	ModelMatrixDemonio[2] = glm::vec4(ejez, 0.0);
 	ModelMatrixDemonio[3][1] = terrain.getHeightTerrain(ModelMatrixDemonio[3][0], ModelMatrixDemonio[3][2]);
 	ModelDemonio.render(renderMatrixDemonio);
-	
+
 	glm::mat4 renderMatrixHechicero = glm::mat4(ModelMatrixHechicero);
 	renderMatrixHechicero = glm::scale(renderMatrixHechicero, glm::vec3(0.01f, 0.01f, 0.01f));
-	//renderMatrixHechicero = glm::rotate(renderMatrixHechicero,glm::radians(90.0f),glm::vec3(-1.0f, 0.0f, 0.0f));
+	// renderMatrixHechicero = glm::rotate(renderMatrixHechicero,glm::radians(90.0f),glm::vec3(-1.0f, 0.0f, 0.0f));
 	ejex = glm::normalize(glm::cross(ejey, ejez));
 	ModelMatrixHechicero[0] = glm::vec4(ejex, 0.0);
 	ModelMatrixHechicero[1] = glm::vec4(ejey, 0.0);
 	ModelMatrixHechicero[2] = glm::vec4(ejez, 0.0);
 	ModelMatrixHechicero[3][1] = terrain.getHeightTerrain(ModelMatrixHechicero[3][0], ModelMatrixHechicero[3][2]);
 	ModelHechicero.render(renderMatrixHechicero);
-	
-	
 
 	/*******************************************
 	 * Skybox
