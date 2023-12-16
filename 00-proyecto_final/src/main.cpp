@@ -664,14 +664,13 @@ glm::mat4 Movimiento (Personaje *Pj,int dado,glm::mat4 ModelMatrixPj){
 				{
 					if (Pj->BanderaPos4 > 0)
 					{
-						ModelMatrixPj = glm::translate(ModelMatrixPj, glm::vec3(0.0 - 6.2  * 6.2, 0.0, 0.0 + Pj->BanderaPos4));
-						
-					}else if(Pj->BanderaPos4 < 0){
-						ModelMatrixPj = glm::translate(ModelMatrixPj, glm::vec3(0.0 - 6.2  * 6.2, 0.0, 0.0));
+						ModelMatrixPj = glm::translate(ModelMatrixPj, glm::vec3(0.0 - 1 * 6.2, 0.0, 0.0 + Pj->BanderaPos4));
+						Pj->BanderaPos4 = 0;
+					}else if(Pj->BanderaPos4 < 1){
+						ModelMatrixPj = glm::translate(ModelMatrixPj, glm::vec3(0.0 - 1 * 6.2, 0.0, 0.0));
 					}
 					Pj->PossTablero = 0;
-						Pj->BanderaPos4 = 0;
-						Pj->vida = Pj->vidaMx;
+					Pj->vida = Pj->vidaMx;
 				}
 				return ModelMatrixPj;
 				//------------------------Fin Movimienots-----------------------------------------------
@@ -1965,6 +1964,7 @@ bool processInput(bool continueApplication)
 			Vengador = TiradaDeSalvacion(Vengador);
 			VengadorSelected = false;
 		}
+		printf("vida del jefe %d\n",Anfiteres.vida);
 	}
 	//--------------------------------------------------------
 	// Cambiar tipo de camara
