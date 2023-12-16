@@ -63,25 +63,31 @@ int screenHeight;
 float cursor_x = -0.5460;
 float cursor_y = 0.8330;
 
-char CadenaVidaCazador[3];
-char CadenaDefCazador[3];
-char CadenaAtqCazador[3];
-char CadenaCDCazador[3];
+char CadenaVidaCazador[10];
+char CadenaDefCazador[10];
+char CadenaAtqCazador[10];
+char CadenaCDCazador[10];
 
-char CadenaVidaSanador[3];
-char CadenaDefSanador[3];
-char CadenaAtqSanador[3];
-char CadenaCDSanador[3];
+char CadenaVidaSanador[10];
+char CadenaDefSanador[10];
+char CadenaAtqSanador[10];
+char CadenaCDSanador[10];
 
-char CadenaVidaCaballero[3];
-char CadenaDefCaballero[3];
-char CadenaAtqCaballero[3];
-char CadenaCDCaballero[3];
+char CadenaVidaCaballero[10];
+char CadenaDefCaballero[10];
+char CadenaAtqCaballero[10];
+char CadenaCDCaballero[10];
 
-char CadenaVidaVengador[3];
-char CadenaDefVengador[3];
-char CadenaAtqVengador[3];
-char CadenaCDVengador[3];
+char CadenaVidaVengador[10];
+char CadenaDefVengador[10];
+char CadenaAtqVengador[10];
+char CadenaCDVengador[10];
+
+char CandenaAtqAnfiteres[10];
+char CandenaVidaAnfiteres[10];
+
+char CandenaAtqMs[10];
+char CandenaVidaMs[10];
 
 const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
 
@@ -260,6 +266,7 @@ struct Personaje
 	int BanderaPos2;
 	int BanderaPos3;
 	int BanderaPos4;
+	int ControlAnimacion;
 };
 
 // Función para inicializar un personaje basado en el tipo
@@ -284,6 +291,7 @@ struct Personaje inicializarPersonaje(int tipo_personaje)
 		personaje.BanderaPos2 = 0;
 		personaje.BanderaPos3 = 0;
 		personaje.BanderaPos4 = 0;
+		personaje.ControlAnimacion = 0;
 
 		break;
 	case 2:
@@ -301,6 +309,7 @@ struct Personaje inicializarPersonaje(int tipo_personaje)
 		personaje.BanderaPos2 = 0;
 		personaje.BanderaPos3 = 0;
 		personaje.BanderaPos4 = 0;
+		personaje.ControlAnimacion = 0;
 
 		break;
 	case 3:
@@ -318,6 +327,7 @@ struct Personaje inicializarPersonaje(int tipo_personaje)
 		personaje.BanderaPos2 = 0;
 		personaje.BanderaPos3 = 0;
 		personaje.BanderaPos4 = 0;
+		personaje.ControlAnimacion = 0;
 
 		break;
 	case 4:
@@ -335,6 +345,7 @@ struct Personaje inicializarPersonaje(int tipo_personaje)
 		personaje.BanderaPos2 = 0;
 		personaje.BanderaPos3 = 0;
 		personaje.BanderaPos4 = 0;
+		personaje.ControlAnimacion = 0;
 
 		break;
 	default:
@@ -349,7 +360,8 @@ struct Monstruo
 {
 	int ataque;	 // Ataque de Monstruo
 	int defensa; // Defensa de Monstruo
-	int vida;	 // vida de Monstruo
+	int vida;
+	int vidaMx;	 // vida de Monstruo
 };
 
 // Función para inicializar un monstruo basado en el tipo
@@ -363,21 +375,25 @@ struct Monstruo inicializarMonstruo(int tipo_monstruo)
 		monstruo.ataque = 2;
 		monstruo.defensa = 3;
 		monstruo.vida = 3;
+		monstruo.vidaMx = 3;
 		break;
 	case 1:
 		monstruo.ataque = 4;
 		monstruo.defensa = 2;
 		monstruo.vida = 5;
+		monstruo.vidaMx = 5;
 		break;
 	case 2:
 		monstruo.ataque = 3;
 		monstruo.defensa = 1;
 		monstruo.vida = 8;
+		monstruo.vidaMx = 8;
 		break;
 	case 3:
 		monstruo.ataque = 8;
 		monstruo.defensa = 5;
-		monstruo.vida = 50;
+		monstruo.vida = 100;
+		monstruo.vidaMx = 100;
 		break;
 	default:
 		// En caso de un tipo de monstruo no reconocido, se inicializan todos los valores a 0
@@ -405,6 +421,7 @@ struct Monstruo Anfiteres = inicializarMonstruo(3);
 // conbate
 void Combate(Personaje *Pj, Monstruo *Ms)
 {
+	
 	printf("Entraste al combate.\n");
 	// Dados
 	int dadoPj = 1 + rand() % 6;
@@ -581,6 +598,7 @@ int keyTablero(int TC)
 
 void Tablero(Personaje *Pj, int dado, Monstruo *Ms, Monstruo *Anfiteres, int Tipo_Casilla)
 {
+	Pj->ControlAnimacion = 0;
 	printf("Entraste al tablero.\n");
 	if (Pj->CD < Pj->CDMX)
 	{
@@ -617,11 +635,13 @@ void Tablero(Personaje *Pj, int dado, Monstruo *Ms, Monstruo *Anfiteres, int Tip
 	case 2:
 		Combate(Pj, Ms);
 		printf("Combate con monstruo.\n");
+		Pj->ControlAnimacion = 1;
 		break;
 
 	case 3:
 		Combate(Pj, Anfiteres);
 		printf("Combate con jefe.\n");
+		Pj->ControlAnimacion = 1;
 		break;
 	default:
 		break;
@@ -2213,8 +2233,10 @@ void renderSolidScene()
 	ModelMatrixCazador[1] = glm::vec4(ejey, 0.0);
 	ModelMatrixCazador[2] = glm::vec4(ejez, 0.0);
 	ModelMatrixCazador[3][1] = terrain.getHeightTerrain(ModelMatrixCazador[3][0], ModelMatrixCazador[3][2]);
-	ModelCazador.setAnimationIndex(1);
+	ModelCazador.setAnimationIndex(Cazador.ControlAnimacion);
+	if(Cazador.vida>1){
 	ModelCazador.render(renderMatrixCazador);
+	}
 
 	glm::mat4 renderMatrixSanador = glm::mat4(ModelMatrixSanador);
 	renderMatrixSanador = glm::scale(renderMatrixSanador, glm::vec3(0.02f, 0.02f, 0.02f));
@@ -2223,8 +2245,10 @@ void renderSolidScene()
 	ModelMatrixSanador[1] = glm::vec4(ejey, 0.0);
 	ModelMatrixSanador[2] = glm::vec4(ejez, 0.0);
 	ModelMatrixSanador[3][1] = terrain.getHeightTerrain(ModelMatrixSanador[3][0], ModelMatrixSanador[3][2]);
-	ModelSanador.setAnimationIndex(0);
+	ModelSanador.setAnimationIndex(Sanador.ControlAnimacion);
+	if(Sanador.vida>0){
 	ModelSanador.render(renderMatrixSanador);
+	}
 
 	glm::mat4 renderMatrixCaballero = glm::mat4(ModelMatrixCaballero);
 	renderMatrixCaballero = glm::scale(renderMatrixCaballero, glm::vec3(0.02f, 0.02f, 0.02f));
@@ -2233,8 +2257,10 @@ void renderSolidScene()
 	ModelMatrixCaballero[1] = glm::vec4(ejey, 0.0);
 	ModelMatrixCaballero[2] = glm::vec4(ejez, 0.0);
 	ModelMatrixCaballero[3][1] = terrain.getHeightTerrain(ModelMatrixCaballero[3][0], ModelMatrixCaballero[3][2]);
-	ModelCaballero.setAnimationIndex(0);
+	ModelCaballero.setAnimationIndex(Caballero.ControlAnimacion);
+	if(Caballero.vida){
 	ModelCaballero.render(renderMatrixCaballero);
+	}
 
 	glm::mat4 renderMatrixVengador = glm::mat4(ModelMatrixVengador);
 	renderMatrixVengador = glm::scale(renderMatrixVengador, glm::vec3(0.02f, 0.02f, 0.02f));
@@ -2243,8 +2269,10 @@ void renderSolidScene()
 	ModelMatrixVengador[1] = glm::vec4(ejey, 0.0);
 	ModelMatrixVengador[2] = glm::vec4(ejez, 0.0);
 	ModelMatrixVengador[3][1] = terrain.getHeightTerrain(ModelMatrixVengador[3][0], ModelMatrixVengador[3][2]);
-	ModelVengador.setAnimationIndex(0);
+	ModelVengador.setAnimationIndex(Vengador.ControlAnimacion);
+	if(Vengador.vida>0){
 	ModelVengador.render(renderMatrixVengador);
+	}
 
 	glm::mat4 renderMatrixAnfiteres = glm::mat4(ModelMatrixAnfiteres);
 	renderMatrixAnfiteres = glm::scale(renderMatrixAnfiteres, glm::vec3(5.0f, 5.0f, 5.0f));
@@ -2268,7 +2296,6 @@ void renderSolidScene()
 
 	glm::mat4 renderMatrixDemonio = glm::mat4(ModelMatrixDemonio);
 	renderMatrixDemonio = glm::scale(renderMatrixDemonio, glm::vec3(0.2f, 0.2f, 0.2f));
-	// renderMatrixDemonio = glm::rotate(renderMatrixDemonio,glm::radians(90.0f),glm::vec3(-1.0f, 0.0f, 0.0f));
 	ejex = glm::normalize(glm::cross(ejey, ejez));
 	ModelMatrixDemonio[0] = glm::vec4(ejex, 0.0);
 	ModelMatrixDemonio[1] = glm::vec4(ejey, 0.0);
@@ -2278,7 +2305,6 @@ void renderSolidScene()
 
 	glm::mat4 renderMatrixHechicero = glm::mat4(ModelMatrixHechicero);
 	renderMatrixHechicero = glm::scale(renderMatrixHechicero, glm::vec3(0.01f, 0.01f, 0.01f));
-	// renderMatrixHechicero = glm::rotate(renderMatrixHechicero,glm::radians(90.0f),glm::vec3(-1.0f, 0.0f, 0.0f));
 	ejex = glm::normalize(glm::cross(ejey, ejez));
 	ModelMatrixHechicero[0] = glm::vec4(ejex, 0.0);
 	ModelMatrixHechicero[1] = glm::vec4(ejey, 0.0);
@@ -2345,22 +2371,66 @@ void renderAlphaScene(bool render = true)
 
 		// std::cout << "cursor_x: " << cursor_x << std::endl;
 		// std::cout << "cursor_y: " << cursor_y << std::endl;
+		//cazador
+		sprintf(CadenaAtqCazador, "%d=>PA", Cazador.ataque);
+		modelText->render(CadenaAtqCazador, -0.5460, 0.833);
 
-		sprintf(CadenaVidaCazador, "%d/6", Cazador.vida);
-		modelText->render(CadenaVidaCazador, -0.5460, 0.8330);
+		sprintf(CadenaVidaCazador, "%d/%d=>PV", Cazador.vida,Cazador.vidaMx);
+		modelText->render(CadenaVidaCazador, -0.5460, 0.773);
 
-		sprintf(CadenaVidaCazador, "%d/6", Cazador.vida);
-		modelText->render(CadenaVidaCazador, -0.5460, 0.6330);
+		sprintf(CadenaCDCazador, "%d/%d=>CD", Cazador.CD,Cazador.CDMX);
+		modelText->render(CadenaCDCazador, -0.5460, 0.713);
 
-		sprintf(CadenaVidaCazador, "%d/6", Cazador.vida);
-		modelText->render(CadenaVidaCazador, -0.5460, 0.6330);
+		//sanador
+		sprintf(CadenaAtqSanador, "%d=>PA", Sanador.ataque);
+		modelText->render(CadenaAtqSanador, -0.0540, 0.833);
 
-		sprintf(CadenaVidaSanador, "%d/10", Sanador.vida);
-		modelText->render(CadenaVidaSanador, -0.0540, 0.8330);
-		sprintf(CadenaVidaCaballero, "%d/8", Caballero.vida);
-		modelText->render(CadenaVidaCaballero, 0.4229, 0.8330);
-		sprintf(CadenaVidaVengador, "%d/10", Vengador.vida);
-		modelText->render(CadenaVidaVengador, 0.8939, 0.8330);
+		sprintf(CadenaVidaSanador, "%d/%d=>PV", Sanador.vida,Sanador.vidaMx);
+		modelText->render(CadenaVidaSanador, -0.0540, 0.773);
+
+		sprintf(CadenaCDSanador, "%d/%d=>CD", Sanador.CD,Sanador.CDMX);
+		modelText->render(CadenaCDSanador, -0.0540, 0.713);
+
+		//Caballero
+		sprintf(CadenaAtqCaballero, "%d=>PA", Caballero.ataque);
+		modelText->render(CadenaAtqCaballero, 0.4229, 0.833);
+
+		sprintf(CadenaVidaCaballero, "%d/%d=>PV", Caballero.vida,Caballero.vidaMx);
+		modelText->render(CadenaVidaCaballero, 0.4229, 0.773);
+
+		sprintf(CadenaCDCaballero, "%d/%d=>CD", Caballero.CD,Caballero.CDMX);
+		modelText->render(CadenaCDCaballero, 0.4229, 0.713);
+		
+		//Vengador
+		sprintf(CadenaAtqVengador, "%d=>PA", Vengador.ataque);
+		modelText->render(CadenaAtqVengador, 0.8939, 0.833);
+		
+		sprintf(CadenaVidaVengador, "%d/%d=>PV", Vengador.vida,Vengador.vidaMx);
+		modelText->render(CadenaVidaVengador, 0.8939, 0.773);
+
+		sprintf(CadenaCDVengador, "%d/%d=>CD", Vengador.CD,Vengador.CDMX);
+		modelText->render(CadenaCDVengador, 0.8939, 0.713);
+		
+		//Anfiteres
+
+		modelText->render("Anfiteres", 0.8939, -0.603);
+		modelText->render("===================", 0.8939, -0.623);
+
+		sprintf(CandenaAtqAnfiteres, "%d=>PA", Anfiteres.ataque);
+		modelText->render(CandenaAtqAnfiteres, 0.8939, -0.653);
+
+		sprintf(CandenaVidaAnfiteres, "%d/%d=PV", Anfiteres.vida,Anfiteres.vidaMx);
+		modelText->render(CandenaVidaAnfiteres, 0.8939, -0.713);
+
+		//MS
+		modelText->render("Monstruos", 0.6939, -0.603);
+		modelText->render("===================", 0.6939, -0.623);
+
+		sprintf(CandenaAtqMs, "%d=>PA", GeneradorMs.ataque);
+		modelText->render(CandenaAtqMs, 0.6939, -0.653);
+
+		sprintf(CandenaVidaMs, "%d/%d=>PV", GeneradorMs.vida,GeneradorMs.vidaMx);
+		modelText->render(CandenaVidaMs, 0.6939, -0.713);
 
 		// cursor_x: -0.5460
 		// cursor_y: 0.8330
@@ -2426,11 +2496,11 @@ void applicationLoop()
 
 	ModelMatrixAnfiteres = glm::translate(ModelMatrixAnfiteres, glm::vec3(0.0, 0.0, 0.0));
 
-	ModelMatrixEsqueleto = glm::translate(ModelMatrixEsqueleto, glm::vec3(5.0, 0.0, 0.0));
+	ModelMatrixEsqueleto = glm::translate(ModelMatrixEsqueleto, glm::vec3(15.0, 1.0, 18.0));
 
-	ModelMatrixEsqueleto = glm::translate(ModelMatrixDemonio, glm::vec3(0.0, 0.0, 0.5));
+	ModelMatrixDemonio = glm::translate(ModelMatrixDemonio, glm::vec3(-25.0, 2.0, 18.0));
 
-	ModelMatrixEsqueleto = glm::translate(ModelMatrixHechicero, glm::vec3(0.5, 0.0, 0.0));
+	ModelMatrixHechicero = glm::translate(ModelMatrixHechicero, glm::vec3(-25.5, 2.0, -18.0));
 
 	// Variables to interpolation key frames
 	// ***
@@ -2498,7 +2568,7 @@ void applicationLoop()
 			axis = glm::axis(glm::quat_cast(ModelMatrixVengador));
 		}
 		camera3P->setAngleTarget(angleTarget);
-		camera3P->setCameraTarget(target);
+		camera3P->setCameraTarget(target+glm::vec3(0.0,5.0,0.0));
 		camera3P->updateCamera();
 		view = camera3P->getViewMatrix();
 
