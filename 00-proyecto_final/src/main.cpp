@@ -238,7 +238,6 @@ struct Personaje
 	int defensa; // Defensa de Personaje
 	int vida;	 // Vida de Personaje (Se modifica constante mente despues de cada accion)
 	int vidaMx;	 // Vida MAX de Personje
-	// int movimiento;		 // Movimientos de Peronsonaje
 	int PossTablero;	 // Posicion de Personaje en el Tableor
 	int TiradaSalvacion; // Tirada de salvacion del personje
 	int CD;				 // Cooldown de Personaje (Se modifica constante mente despues de cada accion)
@@ -613,6 +612,69 @@ void Tablero(Personaje *Pj, int dado, Monstruo *Ms, Monstruo *Anfiteres, int Tip
 	default:
 		break;
 	}
+}
+
+glm::mat4 Movimiento (Personaje *Pj,int dado,glm::mat4 ModelMatrixPj){
+	//----------------------Movimientos-------------------------------------
+				if (Pj->PossTablero > 0 && Pj->PossTablero < 7)
+				{
+					ModelMatrixPj = glm::translate(ModelMatrixPj, glm::vec3(0.0 - (dado) * 6.2, 0.0, 0.0));
+					Pj->BanderaPos1 = 6 - Pj->PossTablero;
+				}
+				if (Pj->PossTablero > 6 && Pj->PossTablero < 14)
+				{
+					if (Pj->BanderaPos1 > 0)
+					{
+						ModelMatrixPj = glm::translate(ModelMatrixPj, glm::vec3(0.0 - Pj->BanderaPos1 * 6.2, 0.0, 0.0 - (dado - Pj->BanderaPos1) * 6.2));
+						Pj->BanderaPos1 = 0;
+					}
+					else if (Pj->BanderaPos1 < 1)
+					{
+						ModelMatrixPj = glm::translate(ModelMatrixPj, glm::vec3(0.0, 0.0, 0.0 - (dado) * 6.2));
+					}
+					Pj->BanderaPos2 = 13 - Pj->PossTablero;
+				}
+				if (Pj->PossTablero > 13 && Pj->PossTablero < 21)
+				{
+					if (Pj->BanderaPos2 > 0)
+					{
+						ModelMatrixPj = glm::translate(ModelMatrixPj, glm::vec3(0.0 + (dado - Pj->BanderaPos2) * 6.2, 0.0, 0.0 - Pj->BanderaPos2 * 6.2));
+						Pj->BanderaPos2 = 0;
+					}
+					else if (Pj->BanderaPos2 < 1)
+					{
+						ModelMatrixPj = glm::translate(ModelMatrixPj, glm::vec3(0.0 + (dado) * 6.2, 0.0, 0.0));
+					}
+					Pj->BanderaPos3 = 20 - Pj->PossTablero;
+				}
+				if (Pj->PossTablero > 20 && Pj->PossTablero < 28)
+				{
+					if (Pj->BanderaPos3 > 0)
+					{
+						ModelMatrixPj = glm::translate(ModelMatrixPj, glm::vec3(0.0 + Pj->BanderaPos3 * 6.2, 0.0, 0.0 + (dado - Pj->BanderaPos3) * 6.2));
+						Pj->BanderaPos3 = 0;
+					}
+					else if (Pj->BanderaPos3 < 1)
+					{
+						ModelMatrixPj = glm::translate(ModelMatrixPj, glm::vec3(0.0, 0.0, 0.0 + (dado) * 6.2));
+					}
+					Pj->BanderaPos4 = 27 - Pj->PossTablero;
+				}
+				if (Pj->PossTablero > 27)
+				{
+					if (Pj->BanderaPos4 > 0)
+					{
+						ModelMatrixPj = glm::translate(ModelMatrixPj, glm::vec3(0.0 - 6.2  * 6.2, 0.0, 0.0 + Pj->BanderaPos4));
+						
+					}else if(Pj->BanderaPos4 < 0){
+						ModelMatrixPj = glm::translate(ModelMatrixPj, glm::vec3(0.0 - 6.2  * 6.2, 0.0, 0.0));
+					}
+					Pj->PossTablero = 0;
+						Pj->BanderaPos4 = 0;
+						Pj->vida = Pj->vidaMx;
+				}
+				return ModelMatrixPj;
+				//------------------------Fin Movimienots-----------------------------------------------
 }
 //---------------------------------------------------------------constructores
 
@@ -1672,60 +1734,7 @@ bool processInput(bool continueApplication)
 				}
 
 				//----------------------Movimientos-------------------------------------
-				if (Cazador.PossTablero > 0 && Cazador.PossTablero < 7)
-				{
-					ModelMatrixCazador = glm::translate(ModelMatrixCazador, glm::vec3(0.0 - (dado) * 6.2, 0.0, 0.0));
-					Cazador.BanderaPos1 = 6 - Cazador.PossTablero;
-				}
-				else if (Cazador.PossTablero > 6 && Cazador.PossTablero < 14)
-				{
-					if (Cazador.BanderaPos1 > 0)
-					{
-						ModelMatrixCazador = glm::translate(ModelMatrixCazador, glm::vec3(0.0 - Cazador.BanderaPos1 * 6.2, 0.0, 0.0 - (dado - Cazador.BanderaPos1) * 6.2));
-						Cazador.BanderaPos1 = 0;
-					}
-					else if (Cazador.BanderaPos1 < 1)
-					{
-						ModelMatrixCazador = glm::translate(ModelMatrixCazador, glm::vec3(0.0, 0.0, 0.0 - (dado) * 6.2));
-						Cazador.BanderaPos2 = 13 - Cazador.PossTablero;
-					}
-				}
-				else if (Cazador.PossTablero > 13 && Cazador.PossTablero < 21)
-				{
-					if (Cazador.BanderaPos2 > 0)
-					{
-						ModelMatrixCazador = glm::translate(ModelMatrixCazador, glm::vec3(0.0 + (dado - Cazador.BanderaPos2) * 6.2, 0.0, 0.0 - Cazador.BanderaPos2 * 6.2));
-						Cazador.BanderaPos2 = 0;
-					}
-					else if (Cazador.BanderaPos2 < 1)
-					{
-						ModelMatrixCazador = glm::translate(ModelMatrixCazador, glm::vec3(0.0 + (dado) * 6.2, 0.0, 0.0));
-						Cazador.BanderaPos3 = 20 - Cazador.PossTablero;
-					}
-				}
-				else if (Cazador.PossTablero > 20 && Cazador.PossTablero < 28)
-				{
-					if (Cazador.BanderaPos3 > 0)
-					{
-						ModelMatrixCazador = glm::translate(ModelMatrixCazador, glm::vec3(0.0 + Cazador.BanderaPos3 * 6.2, 0.0, 0.0 + (dado - Cazador.BanderaPos3) * 6.2));
-						Cazador.BanderaPos3 = 0;
-					}
-					else if (Cazador.BanderaPos3 < 1)
-					{
-						ModelMatrixCazador = glm::translate(ModelMatrixCazador, glm::vec3(0.0, 0.0, 0.0 + (dado) * 6.2));
-						Cazador.BanderaPos4 = 27 - Cazador.PossTablero;
-					}
-				}
-				else if (Cazador.PossTablero > 27)
-				{
-					if (Cazador.BanderaPos4 > 0)
-					{
-
-						ModelMatrixCazador = glm::translate(ModelMatrixCazador, glm::vec3(0.0 + Cazador.BanderaPos4 * 6.2, 0.0, 0.0 - 6.2));
-						Cazador.PossTablero = 0;
-						Cazador.BanderaPos4 = 0;
-					}
-				}
+				ModelMatrixCazador=Movimiento(&Cazador,dado,ModelMatrixCazador);
 				//------------------------Fin Movimienots-----------------------------------------------
 
 				printf("Entro a accion 1 del cazador y su ataque es %d\n", Cazador.ataque);
@@ -1757,60 +1766,7 @@ bool processInput(bool continueApplication)
 					}
 
 					//----------------------Movimientos-------------------------------------
-					if (Cazador.PossTablero > 0 && Cazador.PossTablero < 7)
-					{
-						ModelMatrixCazador = glm::translate(ModelMatrixCazador, glm::vec3(0.0 - (dado) * 6.2, 0.0, 0.0));
-						Cazador.BanderaPos1 = 6 - Cazador.PossTablero;
-					}
-					else if (Cazador.PossTablero > 6 && Cazador.PossTablero < 14)
-					{
-						if (Cazador.BanderaPos1 > 0)
-						{
-							ModelMatrixCazador = glm::translate(ModelMatrixCazador, glm::vec3(0.0 - Cazador.BanderaPos1 * 6.2, 0.0, 0.0 - (dado - Cazador.BanderaPos1) * 6.2));
-							Cazador.BanderaPos1 = 0;
-						}
-						else if (Cazador.BanderaPos1 < 1)
-						{
-							ModelMatrixCazador = glm::translate(ModelMatrixCazador, glm::vec3(0.0, 0.0, 0.0 - (dado) * 6.2));
-							Cazador.BanderaPos2 = 13 - Cazador.PossTablero;
-						}
-					}
-					else if (Cazador.PossTablero > 13 && Cazador.PossTablero < 21)
-					{
-						if (Cazador.BanderaPos2 > 0)
-						{
-							ModelMatrixCazador = glm::translate(ModelMatrixCazador, glm::vec3(0.0 + (dado - Cazador.BanderaPos2) * 6.2, 0.0, 0.0 - Cazador.BanderaPos2 * 6.2));
-							Cazador.BanderaPos2 = 0;
-						}
-						else if (Cazador.BanderaPos2 < 1)
-						{
-							ModelMatrixCazador = glm::translate(ModelMatrixCazador, glm::vec3(0.0 + (dado) * 6.2, 0.0, 0.0));
-							Cazador.BanderaPos3 = 20 - Cazador.PossTablero;
-						}
-					}
-					else if (Cazador.PossTablero > 20 && Cazador.PossTablero < 28)
-					{
-						if (Cazador.BanderaPos3 > 0)
-						{
-							ModelMatrixCazador = glm::translate(ModelMatrixCazador, glm::vec3(0.0 + Cazador.BanderaPos3 * 6.2, 0.0, 0.0 + (dado - Cazador.BanderaPos3) * 6.2));
-							Cazador.BanderaPos3 = 0;
-						}
-						else if (Cazador.BanderaPos3 < 1)
-						{
-							ModelMatrixCazador = glm::translate(ModelMatrixCazador, glm::vec3(0.0, 0.0, 0.0 + (dado) * 6.2));
-							Cazador.BanderaPos4 = 27 - Cazador.PossTablero;
-						}
-					}
-					else if (Cazador.PossTablero > 27)
-					{
-						if (Cazador.BanderaPos4 > 0)
-						{
-
-							ModelMatrixCazador = glm::translate(ModelMatrixCazador, glm::vec3(0.0 + Cazador.BanderaPos4 * 6.2, 0.0, 0.0 - 6.2));
-							Cazador.PossTablero = 0;
-							Cazador.BanderaPos4 = 0;
-						}
-					}
+					ModelMatrixCazador=Movimiento(&Cazador,dado,ModelMatrixCazador);
 					//------------------------Fin Movimienots-----------------------------------------------
 
 					printf("Entro a accion 2 del cazador y su ataque es %d\n", Cazador.ataque);
@@ -1857,60 +1813,7 @@ bool processInput(bool continueApplication)
 				}
 
 				//----------------------Movimientos-------------------------------------
-				if (Sanador.PossTablero > 0 && Sanador.PossTablero < 7)
-				{
-					ModelMatrixSanador = glm::translate(ModelMatrixSanador, glm::vec3(0.0 - (dado) * 6.2, 0.0, 0.0));
-					Sanador.BanderaPos1 = 6 - Sanador.PossTablero;
-				}
-				else if (Sanador.PossTablero > 6 && Sanador.PossTablero < 14)
-				{
-					if (Sanador.BanderaPos1 > 0)
-					{
-						ModelMatrixSanador = glm::translate(ModelMatrixSanador, glm::vec3(0.0 - Sanador.BanderaPos1 * 6.2, 0.0, 0.0 - (dado - Sanador.BanderaPos1) * 6.2));
-						Sanador.BanderaPos1 = 0;
-					}
-					else if (Sanador.BanderaPos1 < 1)
-					{
-						ModelMatrixSanador = glm::translate(ModelMatrixSanador, glm::vec3(0.0, 0.0, 0.0 - (dado) * 6.2));
-						Sanador.BanderaPos2 = 13 - Sanador.PossTablero;
-					}
-				}
-				else if (Sanador.PossTablero > 13 && Sanador.PossTablero < 21)
-				{
-					if (Sanador.BanderaPos2 > 0)
-					{
-						ModelMatrixSanador = glm::translate(ModelMatrixSanador, glm::vec3(0.0 + (dado - Sanador.BanderaPos2) * 6.2, 0.0, 0.0 - Sanador.BanderaPos2 * 6.2));
-						Sanador.BanderaPos2 = 0;
-					}
-					else if (Sanador.BanderaPos2 < 1)
-					{
-						ModelMatrixSanador = glm::translate(ModelMatrixSanador, glm::vec3(0.0 + (dado) * 6.2, 0.0, 0.0));
-						Sanador.BanderaPos3 = 20 - Sanador.PossTablero;
-					}
-				}
-				else if (Sanador.PossTablero > 20 && Sanador.PossTablero < 28)
-				{
-					if (Sanador.BanderaPos3 > 0)
-					{
-						ModelMatrixSanador = glm::translate(ModelMatrixSanador, glm::vec3(0.0 + Sanador.BanderaPos3 * 6.2, 0.0, 0.0 + (dado - Sanador.BanderaPos3) * 6.2));
-						Sanador.BanderaPos3 = 0;
-					}
-					else if (Sanador.BanderaPos3 < 1)
-					{
-						ModelMatrixSanador = glm::translate(ModelMatrixSanador, glm::vec3(0.0, 0.0, 0.0 + (dado) * 6.2));
-						Sanador.BanderaPos4 = 27 - Sanador.PossTablero;
-					}
-				}
-				else if (Sanador.PossTablero > 27)
-				{
-					if (Sanador.BanderaPos4 > 0)
-					{
-
-						ModelMatrixSanador = glm::translate(ModelMatrixSanador, glm::vec3(0.0 + Sanador.BanderaPos4 * 6.2, 0.0, 0.0 - 6.2));
-						Sanador.PossTablero = 0;
-						Sanador.BanderaPos4 = 0;
-					}
-				}
+				ModelMatrixSanador=Movimiento(&Sanador,dado,ModelMatrixSanador);
 				//------------------------Fin Movimienots-----------------------------------------------
 
 				printf("Entro a accion 1 del sanador y su ataque es %d\n", Sanador.ataque);
@@ -1946,60 +1849,7 @@ bool processInput(bool continueApplication)
 						PerderBuffo(buffo, &Sanador);
 					}
 					//----------------------Movimientos-------------------------------------
-					if (Sanador.PossTablero > 0 && Sanador.PossTablero < 7)
-					{
-						ModelMatrixSanador = glm::translate(ModelMatrixSanador, glm::vec3(0.0 - (dado) * 6.2, 0.0, 0.0));
-						Sanador.BanderaPos1 = 6 - Sanador.PossTablero;
-					}
-					else if (Sanador.PossTablero > 6 && Sanador.PossTablero < 14)
-					{
-						if (Sanador.BanderaPos1 > 0)
-						{
-							ModelMatrixSanador = glm::translate(ModelMatrixSanador, glm::vec3(0.0 - Sanador.BanderaPos1 * 6.2, 0.0, 0.0 - (dado - Sanador.BanderaPos1) * 6.2));
-							Sanador.BanderaPos1 = 0;
-						}
-						else if (Sanador.BanderaPos1 < 1)
-						{
-							ModelMatrixSanador = glm::translate(ModelMatrixSanador, glm::vec3(0.0, 0.0, 0.0 - (dado) * 6.2));
-							Sanador.BanderaPos2 = 13 - Sanador.PossTablero;
-						}
-					}
-					else if (Sanador.PossTablero > 13 && Sanador.PossTablero < 21)
-					{
-						if (Sanador.BanderaPos2 > 0)
-						{
-							ModelMatrixSanador = glm::translate(ModelMatrixSanador, glm::vec3(0.0 + (dado - Sanador.BanderaPos2) * 6.2, 0.0, 0.0 - Sanador.BanderaPos2 * 6.2));
-							Sanador.BanderaPos2 = 0;
-						}
-						else if (Sanador.BanderaPos2 < 1)
-						{
-							ModelMatrixSanador = glm::translate(ModelMatrixSanador, glm::vec3(0.0 + (dado) * 6.2, 0.0, 0.0));
-							Sanador.BanderaPos3 = 20 - Sanador.PossTablero;
-						}
-					}
-					else if (Sanador.PossTablero > 20 && Sanador.PossTablero < 28)
-					{
-						if (Sanador.BanderaPos3 > 0)
-						{
-							ModelMatrixSanador = glm::translate(ModelMatrixSanador, glm::vec3(0.0 + Sanador.BanderaPos3 * 6.2, 0.0, 0.0 + (dado - Sanador.BanderaPos3) * 6.2));
-							Sanador.BanderaPos3 = 0;
-						}
-						else if (Sanador.BanderaPos3 < 1)
-						{
-							ModelMatrixSanador = glm::translate(ModelMatrixSanador, glm::vec3(0.0, 0.0, 0.0 + (dado) * 6.2));
-							Sanador.BanderaPos4 = 27 - Sanador.PossTablero;
-						}
-					}
-					else if (Sanador.PossTablero > 27)
-					{
-						if (Sanador.BanderaPos4 > 0)
-						{
-
-							ModelMatrixSanador = glm::translate(ModelMatrixSanador, glm::vec3(0.0 + Sanador.BanderaPos4 * 6.2, 0.0, 0.0 - 6.2));
-							Sanador.PossTablero = 0;
-							Sanador.BanderaPos4 = 0;
-						}
-					}
+					ModelMatrixSanador=Movimiento(&Sanador,dado,ModelMatrixSanador);
 					//------------------------Fin Movimienots-----------------------------------------------
 					printf("Entro a accion 2 del sanador y su ataque es %d\n", Sanador.ataque);
 					printf("Entro a accion 2 del sanador y su defensa es %d\n", Sanador.defensa);
@@ -2033,60 +1883,7 @@ bool processInput(bool continueApplication)
 					PerderBuffo(buffo, &Caballero);
 				}
 				//----------------------Movimientos-------------------------------------
-				if (Caballero.PossTablero > 0 && Caballero.PossTablero < 7)
-				{
-					ModelMatrixCaballero = glm::translate(ModelMatrixCaballero, glm::vec3(0.0 - (dado) * 6.2, 0.0, 0.0));
-					Caballero.BanderaPos1 = 6 - Caballero.PossTablero;
-				}
-				else if (Caballero.PossTablero > 6 && Caballero.PossTablero < 14)
-				{
-					if (Caballero.BanderaPos1 > 0)
-					{
-						ModelMatrixCaballero = glm::translate(ModelMatrixCaballero, glm::vec3(0.0 - Caballero.BanderaPos1 * 6.2, 0.0, 0.0 - (dado - Caballero.BanderaPos1) * 6.2));
-						Caballero.BanderaPos1 = 0;
-					}
-					else if (Caballero.BanderaPos1 < 1)
-					{
-						ModelMatrixCaballero = glm::translate(ModelMatrixCaballero, glm::vec3(0.0, 0.0, 0.0 - (dado) * 6.2));
-						Caballero.BanderaPos2 = 13 - Caballero.PossTablero;
-					}
-				}
-				else if (Caballero.PossTablero > 13 && Caballero.PossTablero < 21)
-				{
-					if (Caballero.BanderaPos2 > 0)
-					{
-						ModelMatrixCaballero = glm::translate(ModelMatrixCaballero, glm::vec3(0.0 + (dado - Caballero.BanderaPos2) * 6.2, 0.0, 0.0 - Caballero.BanderaPos2 * 6.2));
-						Caballero.BanderaPos2 = 0;
-					}
-					else if (Caballero.BanderaPos2 < 1)
-					{
-						ModelMatrixCaballero = glm::translate(ModelMatrixCaballero, glm::vec3(0.0 + (dado) * 6.2, 0.0, 0.0));
-						Caballero.BanderaPos3 = 20 - Caballero.PossTablero;
-					}
-				}
-				else if (Caballero.PossTablero > 20 && Caballero.PossTablero < 28)
-				{
-					if (Caballero.BanderaPos3 > 0)
-					{
-						ModelMatrixCaballero = glm::translate(ModelMatrixCaballero, glm::vec3(0.0 + Caballero.BanderaPos3 * 6.2, 0.0, 0.0 + (dado - Caballero.BanderaPos3) * 6.2));
-						Caballero.BanderaPos3 = 0;
-					}
-					else if (Caballero.BanderaPos3 < 1)
-					{
-						ModelMatrixCaballero = glm::translate(ModelMatrixCaballero, glm::vec3(0.0, 0.0, 0.0 + (dado) * 6.2));
-						Caballero.BanderaPos4 = 27 - Caballero.PossTablero;
-					}
-				}
-				else if (Caballero.PossTablero > 27)
-				{
-					if (Caballero.BanderaPos4 > 0)
-					{
-
-						ModelMatrixCaballero = glm::translate(ModelMatrixCaballero, glm::vec3(0.0 + Caballero.BanderaPos4 * 6.2, 0.0, 0.0 - 6.2));
-						Caballero.PossTablero = 0;
-						Caballero.BanderaPos4 = 0;
-					}
-				}
+				ModelMatrixCaballero=Movimiento(&Caballero,dado,ModelMatrixCaballero);
 				//------------------------Fin Movimienots-----------------------------------------------
 				printf("Entro a accion 1 del caballero y su ataque es %d\n", Caballero.ataque);
 				printf("Entro a accion 1 del caballero y su defensa es %d\n", Caballero.defensa);
@@ -2106,60 +1903,7 @@ bool processInput(bool continueApplication)
 					PerderBuffo(buffo, &Caballero);
 				}
 				//----------------------Movimientos-------------------------------------
-				if (Caballero.PossTablero > 0 && Caballero.PossTablero < 7)
-				{
-					ModelMatrixCaballero = glm::translate(ModelMatrixCaballero, glm::vec3(0.0 - (dado) * 6.2, 0.0, 0.0));
-					Caballero.BanderaPos1 = 6 - Caballero.PossTablero;
-				}
-				else if (Caballero.PossTablero > 6 && Caballero.PossTablero < 14)
-				{
-					if (Caballero.BanderaPos1 > 0)
-					{
-						ModelMatrixCaballero = glm::translate(ModelMatrixCaballero, glm::vec3(0.0 - Caballero.BanderaPos1 * 6.2, 0.0, 0.0 - (dado - Caballero.BanderaPos1) * 6.2));
-						Caballero.BanderaPos1 = 0;
-					}
-					else if (Caballero.BanderaPos1 < 1)
-					{
-						ModelMatrixCaballero = glm::translate(ModelMatrixCaballero, glm::vec3(0.0, 0.0, 0.0 - (dado) * 6.2));
-						Caballero.BanderaPos2 = 13 - Caballero.PossTablero;
-					}
-				}
-				else if (Caballero.PossTablero > 13 && Caballero.PossTablero < 21)
-				{
-					if (Caballero.BanderaPos2 > 0)
-					{
-						ModelMatrixCaballero = glm::translate(ModelMatrixCaballero, glm::vec3(0.0 + (dado - Caballero.BanderaPos2) * 6.2, 0.0, 0.0 - Caballero.BanderaPos2 * 6.2));
-						Caballero.BanderaPos2 = 0;
-					}
-					else if (Caballero.BanderaPos2 < 1)
-					{
-						ModelMatrixCaballero = glm::translate(ModelMatrixCaballero, glm::vec3(0.0 + (dado) * 6.2, 0.0, 0.0));
-						Caballero.BanderaPos3 = 20 - Caballero.PossTablero;
-					}
-				}
-				else if (Caballero.PossTablero > 20 && Caballero.PossTablero < 28)
-				{
-					if (Caballero.BanderaPos3 > 0)
-					{
-						ModelMatrixCaballero = glm::translate(ModelMatrixCaballero, glm::vec3(0.0 + Caballero.BanderaPos3 * 6.2, 0.0, 0.0 + (dado - Caballero.BanderaPos3) * 6.2));
-						Caballero.BanderaPos3 = 0;
-					}
-					else if (Caballero.BanderaPos3 < 1)
-					{
-						ModelMatrixCaballero = glm::translate(ModelMatrixCaballero, glm::vec3(0.0, 0.0, 0.0 + (dado) * 6.2));
-						Caballero.BanderaPos4 = 27 - Caballero.PossTablero;
-					}
-				}
-				else if (Caballero.PossTablero > 27)
-				{
-					if (Caballero.BanderaPos4 > 0)
-					{
-
-						ModelMatrixCaballero = glm::translate(ModelMatrixCaballero, glm::vec3(0.0 + Caballero.BanderaPos4 * 6.2, 0.0, 0.0 - 6.2));
-						Caballero.PossTablero = 0;
-						Caballero.BanderaPos4 = 0;
-					}
-				}
+				ModelMatrixCaballero=Movimiento(&Caballero,dado,ModelMatrixCaballero);
 				//------------------------Fin Movimienots-----------------------------------------------
 				Caballero.defensa = Caballero.defensa - 2;
 				printf("Entro a accion 2 del caballero y su ataque es %d\n", Caballero.ataque);
@@ -2189,60 +1933,7 @@ bool processInput(bool continueApplication)
 				PerderBuffo(buffo, &Vengador);
 			}
 			//----------------------Movimientos-------------------------------------
-			if (Vengador.PossTablero > 0 && Vengador.PossTablero < 7)
-			{
-				ModelMatrixVengador = glm::translate(ModelMatrixVengador, glm::vec3(0.0 - (dado) * 6.2, 0.0, 0.0));
-				Vengador.BanderaPos1 = 6 - Vengador.PossTablero;
-			}
-			else if (Vengador.PossTablero > 6 && Vengador.PossTablero < 14)
-			{
-				if (Vengador.BanderaPos1 > 0)
-				{
-					ModelMatrixVengador = glm::translate(ModelMatrixVengador, glm::vec3(0.0 - Vengador.BanderaPos1 * 6.2, 0.0, 0.0 - (dado - Vengador.BanderaPos1) * 6.2));
-					Vengador.BanderaPos1 = 0;
-				}
-				else if (Vengador.BanderaPos1 < 1)
-				{
-					ModelMatrixVengador = glm::translate(ModelMatrixVengador, glm::vec3(0.0, 0.0, 0.0 - (dado) * 6.2));
-					Vengador.BanderaPos2 = 13 - Vengador.PossTablero;
-				}
-			}
-			else if (Vengador.PossTablero > 13 && Vengador.PossTablero < 21)
-			{
-				if (Vengador.BanderaPos2 > 0)
-				{
-					ModelMatrixVengador = glm::translate(ModelMatrixVengador, glm::vec3(0.0 + (dado - Vengador.BanderaPos2) * 6.2, 0.0, 0.0 - Vengador.BanderaPos2 * 6.2));
-					Caballero.BanderaPos2 = 0;
-				}
-				else if (Vengador.BanderaPos2 < 1)
-				{
-					ModelMatrixVengador = glm::translate(ModelMatrixVengador, glm::vec3(0.0 + (dado) * 6.2, 0.0, 0.0));
-					Vengador.BanderaPos3 = 20 - Vengador.PossTablero;
-				}
-			}
-			else if (Vengador.PossTablero > 20 && Vengador.PossTablero < 28)
-			{
-				if (Vengador.BanderaPos3 > 0)
-				{
-					ModelMatrixVengador = glm::translate(ModelMatrixVengador, glm::vec3(0.0 + Vengador.BanderaPos3 * 6.2, 0.0, 0.0 + (dado - Vengador.BanderaPos3) * 6.2));
-					Vengador.BanderaPos3 = 0;
-				}
-				else if (Vengador.BanderaPos3 < 1)
-				{
-					ModelMatrixVengador = glm::translate(ModelMatrixVengador, glm::vec3(0.0, 0.0, 0.0 + (dado) * 6.2));
-					Vengador.BanderaPos4 = 27 - Vengador.PossTablero;
-				}
-			}
-			else if (Vengador.PossTablero > 27)
-			{
-				if (Vengador.BanderaPos4 > 0)
-				{
-
-					ModelMatrixVengador = glm::translate(ModelMatrixVengador, glm::vec3(0.0 + Vengador.BanderaPos4 * 6.2, 0.0, 0.0 - 6.2));
-					Vengador.PossTablero = 0;
-					Vengador.BanderaPos4 = 0;
-				}
-			}
+			ModelMatrixVengador=Movimiento(&Vengador,dado,ModelMatrixVengador);
 			//------------------------Fin Movimienots-----------------------------------------------
 			printf("Entro a accion 1 del vengador y su ataque es %d\n", Vengador.ataque);
 			printf("Entro a accion 1 del vengador y su defensa es %d\n", Vengador.defensa);
@@ -2262,60 +1953,7 @@ bool processInput(bool continueApplication)
 				PerderBuffo(buffo, &Vengador);
 			}
 			//----------------------Movimientos-------------------------------------
-			if (Vengador.PossTablero > 0 && Vengador.PossTablero < 7)
-			{
-				ModelMatrixVengador = glm::translate(ModelMatrixVengador, glm::vec3(0.0 - (dado) * 6.2, 0.0, 0.0));
-				Vengador.BanderaPos1 = 6 - Vengador.PossTablero;
-			}
-			else if (Vengador.PossTablero > 6 && Vengador.PossTablero < 14)
-			{
-				if (Vengador.BanderaPos1 > 0)
-				{
-					ModelMatrixVengador = glm::translate(ModelMatrixVengador, glm::vec3(0.0 - Vengador.BanderaPos1 * 6.2, 0.0, 0.0 - (dado - Vengador.BanderaPos1) * 6.2));
-					Vengador.BanderaPos1 = 0;
-				}
-				else if (Vengador.BanderaPos1 < 1)
-				{
-					ModelMatrixVengador = glm::translate(ModelMatrixVengador, glm::vec3(0.0, 0.0, 0.0 - (dado) * 6.2));
-					Vengador.BanderaPos2 = 13 - Vengador.PossTablero;
-				}
-			}
-			else if (Vengador.PossTablero > 13 && Vengador.PossTablero < 21)
-			{
-				if (Vengador.BanderaPos2 > 0)
-				{
-					ModelMatrixVengador = glm::translate(ModelMatrixVengador, glm::vec3(0.0 + (dado - Vengador.BanderaPos2) * 6.2, 0.0, 0.0 - Vengador.BanderaPos2 * 6.2));
-					Caballero.BanderaPos2 = 0;
-				}
-				else if (Vengador.BanderaPos2 < 1)
-				{
-					ModelMatrixVengador = glm::translate(ModelMatrixVengador, glm::vec3(0.0 + (dado) * 6.2, 0.0, 0.0));
-					Vengador.BanderaPos3 = 20 - Vengador.PossTablero;
-				}
-			}
-			else if (Vengador.PossTablero > 20 && Vengador.PossTablero < 28)
-			{
-				if (Vengador.BanderaPos3 > 0)
-				{
-					ModelMatrixVengador = glm::translate(ModelMatrixVengador, glm::vec3(0.0 + Vengador.BanderaPos3 * 6.2, 0.0, 0.0 + (dado - Vengador.BanderaPos3) * 6.2));
-					Vengador.BanderaPos3 = 0;
-				}
-				else if (Vengador.BanderaPos3 < 1)
-				{
-					ModelMatrixVengador = glm::translate(ModelMatrixVengador, glm::vec3(0.0, 0.0, 0.0 + (dado) * 6.2));
-					Vengador.BanderaPos4 = 27 - Vengador.PossTablero;
-				}
-			}
-			else if (Vengador.PossTablero > 27)
-			{
-				if (Vengador.BanderaPos4 > 0)
-				{
-
-					ModelMatrixVengador = glm::translate(ModelMatrixVengador, glm::vec3(0.0 + Vengador.BanderaPos4 * 6.2, 0.0, 0.0 - 6.2));
-					Vengador.PossTablero = 0;
-					Vengador.BanderaPos4 = 0;
-				}
-			}
+			ModelMatrixVengador=Movimiento(&Vengador,dado,ModelMatrixVengador);
 			//------------------------Fin Movimienots-----------------------------------------------
 			printf("Entro a accion 2 del vengador y su ataque es %d\n", Vengador.ataque);
 			printf("Entro a accion 2 del vengador y su defensa es %d\n", Vengador.defensa);
@@ -2434,9 +2072,6 @@ void renderSolidScene()
 
 	glm::mat4 renderMatrixSanador = glm::mat4(ModelMatrixSanador);
 	renderMatrixSanador = glm::scale(renderMatrixSanador, glm::vec3(0.02f, 0.02f, 0.02f));
-	//glm::vec3 ejey = glm::normalize(terrain.getNormalTerrain(ModelMatrixSanador[3][0], ModelMatrixSanador[3][2]));
-	//glm::vec3 ejex = glm::vec3(ModelMatrixSanador[0]);
-	//glm::vec3 ejez = glm::normalize(glm::cross(ejex, ejey));
 	ejex = glm::normalize(glm::cross(ejey, ejez));
 	ModelMatrixSanador[0] = glm::vec4(ejex, 0.0);
 	ModelMatrixSanador[1] = glm::vec4(ejey, 0.0);
