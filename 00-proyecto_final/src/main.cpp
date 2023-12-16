@@ -152,12 +152,13 @@ GLuint textureTerrainRID, textureTerrainGID, textureTerrainBID, textureTerrainBl
 GLuint skyboxTextureID;
 GLuint txs_active;
 GLuint txs_main_title01, txs_main_title02, txs_main_title03;
-GLuint txs_gameplay_ui_personajes;
+GLuint txs_gameplay_ui_00, txs_gameplay_ui_01, txs_gameplay_ui_02;
 GLuint txs_gameplay_efecto_ataque, txs_gameplay_efecto_defensa, txs_gameplay_efecto_velocidad;
 
 bool iniciaPartida = false, presionarOpcion = false;
 bool en_pantalla_de_juego = false;
 bool ena_key_enter = true, ena_key_left = true, ena_key_right = true;
+bool ena_key_up = true, ena_key_down = true;
 bool ena_key_z = true, ena_key_x = true, ena_key_c = true;
 
 // Modelo para el render del texto
@@ -233,11 +234,11 @@ int buffo = 0;
 struct Personaje
 {
 	// Valores base de cada persoanje
-	int TipoPj;	 // Tipo de Personaje
-	int ataque;	 // Ataque de Personaje
-	int defensa; // Defensa de Personaje
-	int vida;	 // Vida de Personaje (Se modifica constante mente despues de cada accion)
-	int vidaMx;	 // Vida MAX de Personje
+	int TipoPj;			 // Tipo de Personaje
+	int ataque;			 // Ataque de Personaje
+	int defensa;		 // Defensa de Personaje
+	int vida;			 // Vida de Personaje (Se modifica constante mente despues de cada accion)
+	int vidaMx;			 // Vida MAX de Personje
 	int PossTablero;	 // Posicion de Personaje en el Tableor
 	int TiradaSalvacion; // Tirada de salvacion del personje
 	int CD;				 // Cooldown de Personaje (Se modifica constante mente despues de cada accion)
@@ -614,66 +615,69 @@ void Tablero(Personaje *Pj, int dado, Monstruo *Ms, Monstruo *Anfiteres, int Tip
 	}
 }
 
-glm::mat4 Movimiento (Personaje *Pj,int dado,glm::mat4 ModelMatrixPj){
+glm::mat4 Movimiento(Personaje *Pj, int dado, glm::mat4 ModelMatrixPj)
+{
 	//----------------------Movimientos-------------------------------------
-				if (Pj->PossTablero > 0 && Pj->PossTablero < 7)
-				{
-					ModelMatrixPj = glm::translate(ModelMatrixPj, glm::vec3(0.0 - (dado) * 6.2, 0.0, 0.0));
-					Pj->BanderaPos1 = 6 - Pj->PossTablero;
-				}
-				if (Pj->PossTablero > 6 && Pj->PossTablero < 14)
-				{
-					if (Pj->BanderaPos1 > 0)
-					{
-						ModelMatrixPj = glm::translate(ModelMatrixPj, glm::vec3(0.0 - Pj->BanderaPos1 * 6.2, 0.0, 0.0 - (dado - Pj->BanderaPos1) * 6.2));
-						Pj->BanderaPos1 = 0;
-					}
-					else if (Pj->BanderaPos1 < 1)
-					{
-						ModelMatrixPj = glm::translate(ModelMatrixPj, glm::vec3(0.0, 0.0, 0.0 - (dado) * 6.2));
-					}
-					Pj->BanderaPos2 = 13 - Pj->PossTablero;
-				}
-				if (Pj->PossTablero > 13 && Pj->PossTablero < 21)
-				{
-					if (Pj->BanderaPos2 > 0)
-					{
-						ModelMatrixPj = glm::translate(ModelMatrixPj, glm::vec3(0.0 + (dado - Pj->BanderaPos2) * 6.2, 0.0, 0.0 - Pj->BanderaPos2 * 6.2));
-						Pj->BanderaPos2 = 0;
-					}
-					else if (Pj->BanderaPos2 < 1)
-					{
-						ModelMatrixPj = glm::translate(ModelMatrixPj, glm::vec3(0.0 + (dado) * 6.2, 0.0, 0.0));
-					}
-					Pj->BanderaPos3 = 20 - Pj->PossTablero;
-				}
-				if (Pj->PossTablero > 20 && Pj->PossTablero < 28)
-				{
-					if (Pj->BanderaPos3 > 0)
-					{
-						ModelMatrixPj = glm::translate(ModelMatrixPj, glm::vec3(0.0 + Pj->BanderaPos3 * 6.2, 0.0, 0.0 + (dado - Pj->BanderaPos3) * 6.2));
-						Pj->BanderaPos3 = 0;
-					}
-					else if (Pj->BanderaPos3 < 1)
-					{
-						ModelMatrixPj = glm::translate(ModelMatrixPj, glm::vec3(0.0, 0.0, 0.0 + (dado) * 6.2));
-					}
-					Pj->BanderaPos4 = 27 - Pj->PossTablero;
-				}
-				if (Pj->PossTablero > 27)
-				{
-					if (Pj->BanderaPos4 > 0)
-					{
-						ModelMatrixPj = glm::translate(ModelMatrixPj, glm::vec3(0.0 - 1 * 6.2, 0.0, 0.0 + Pj->BanderaPos4));
-						Pj->BanderaPos4 = 0;
-					}else if(Pj->BanderaPos4 < 1){
-						ModelMatrixPj = glm::translate(ModelMatrixPj, glm::vec3(0.0 - 1 * 6.2, 0.0, 0.0));
-					}
-					Pj->PossTablero = 0;
-					Pj->vida = Pj->vidaMx;
-				}
-				return ModelMatrixPj;
-				//------------------------Fin Movimienots-----------------------------------------------
+	if (Pj->PossTablero > 0 && Pj->PossTablero < 7)
+	{
+		ModelMatrixPj = glm::translate(ModelMatrixPj, glm::vec3(0.0 - (dado) * 6.2, 0.0, 0.0));
+		Pj->BanderaPos1 = 6 - Pj->PossTablero;
+	}
+	if (Pj->PossTablero > 6 && Pj->PossTablero < 14)
+	{
+		if (Pj->BanderaPos1 > 0)
+		{
+			ModelMatrixPj = glm::translate(ModelMatrixPj, glm::vec3(0.0 - Pj->BanderaPos1 * 6.2, 0.0, 0.0 - (dado - Pj->BanderaPos1) * 6.2));
+			Pj->BanderaPos1 = 0;
+		}
+		else if (Pj->BanderaPos1 < 1)
+		{
+			ModelMatrixPj = glm::translate(ModelMatrixPj, glm::vec3(0.0, 0.0, 0.0 - (dado) * 6.2));
+		}
+		Pj->BanderaPos2 = 13 - Pj->PossTablero;
+	}
+	if (Pj->PossTablero > 13 && Pj->PossTablero < 21)
+	{
+		if (Pj->BanderaPos2 > 0)
+		{
+			ModelMatrixPj = glm::translate(ModelMatrixPj, glm::vec3(0.0 + (dado - Pj->BanderaPos2) * 6.2, 0.0, 0.0 - Pj->BanderaPos2 * 6.2));
+			Pj->BanderaPos2 = 0;
+		}
+		else if (Pj->BanderaPos2 < 1)
+		{
+			ModelMatrixPj = glm::translate(ModelMatrixPj, glm::vec3(0.0 + (dado) * 6.2, 0.0, 0.0));
+		}
+		Pj->BanderaPos3 = 20 - Pj->PossTablero;
+	}
+	if (Pj->PossTablero > 20 && Pj->PossTablero < 28)
+	{
+		if (Pj->BanderaPos3 > 0)
+		{
+			ModelMatrixPj = glm::translate(ModelMatrixPj, glm::vec3(0.0 + Pj->BanderaPos3 * 6.2, 0.0, 0.0 + (dado - Pj->BanderaPos3) * 6.2));
+			Pj->BanderaPos3 = 0;
+		}
+		else if (Pj->BanderaPos3 < 1)
+		{
+			ModelMatrixPj = glm::translate(ModelMatrixPj, glm::vec3(0.0, 0.0, 0.0 + (dado) * 6.2));
+		}
+		Pj->BanderaPos4 = 27 - Pj->PossTablero;
+	}
+	if (Pj->PossTablero > 27)
+	{
+		if (Pj->BanderaPos4 > 0)
+		{
+			ModelMatrixPj = glm::translate(ModelMatrixPj, glm::vec3(0.0 - 1 * 6.2, 0.0, 0.0 + Pj->BanderaPos4));
+			Pj->BanderaPos4 = 0;
+		}
+		else if (Pj->BanderaPos4 < 1)
+		{
+			ModelMatrixPj = glm::translate(ModelMatrixPj, glm::vec3(0.0 - 1 * 6.2, 0.0, 0.0));
+		}
+		Pj->PossTablero = 0;
+		Pj->vida = Pj->vidaMx;
+	}
+	return ModelMatrixPj;
+	//------------------------Fin Movimienots-----------------------------------------------
 }
 //---------------------------------------------------------------constructores
 
@@ -1185,24 +1189,64 @@ void init(int width, int height, std::string strTitle, bool bFullScreen)
 	texture_screen_03.freeImage(); // Liberamos memoria
 
 	// Definiendo la textura
-	Texture textureScreen("../media/textures/ui_personajes_00.png");
-	textureScreen.loadImage();										  // Cargar la textura
-	glGenTextures(1, &txs_gameplay_ui_personajes);					  // Creando el id de la textura del landingpad
-	glBindTexture(GL_TEXTURE_2D, txs_gameplay_ui_personajes);		  // Se enlaza la textura
+	Texture textureScreen00("../media/textures_screen/gameplay_00.PNG");
+	textureScreen00.loadImage();										  // Cargar la textura
+	glGenTextures(1, &txs_gameplay_ui_00);							  // Creando el id de la textura del landingpad
+	glBindTexture(GL_TEXTURE_2D, txs_gameplay_ui_00);				  // Se enlaza la textura
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	  // Wrapping en el eje u
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);	  // Wrapping en el eje v
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // Filtering de minimización
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // Filtering de maximimizacion
-	if (textureScreen.getData())
+	if (textureScreen00.getData())
 	{
 		// Transferir los datos de la imagen a la tarjeta
-		glTexImage2D(GL_TEXTURE_2D, 0, textureScreen.getChannels() == 3 ? GL_RGB : GL_RGBA, textureScreen.getWidth(), textureScreen.getHeight(), 0,
-					 textureScreen.getChannels() == 3 ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, textureScreen.getData());
+		glTexImage2D(GL_TEXTURE_2D, 0, textureScreen00.getChannels() == 3 ? GL_RGB : GL_RGBA, textureScreen00.getWidth(), textureScreen00.getHeight(), 0,
+					 textureScreen00.getChannels() == 3 ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, textureScreen00.getData());
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	else
 		std::cout << "Fallo la carga de textura" << std::endl;
-	textureScreen.freeImage(); // Liberamos memoria
+	textureScreen00.freeImage(); // Liberamos memoria
+
+	// Definiendo la textura
+	Texture textureScreen01("../media/textures_screen/gameplay_01.PNG");
+	textureScreen01.loadImage();										  // Cargar la textura
+	glGenTextures(1, &txs_gameplay_ui_01);							  // Creando el id de la textura del landingpad
+	glBindTexture(GL_TEXTURE_2D, txs_gameplay_ui_01);				  // Se enlaza la textura
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	  // Wrapping en el eje u
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);	  // Wrapping en el eje v
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // Filtering de minimización
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // Filtering de maximimizacion
+	if (textureScreen01.getData())
+	{
+		// Transferir los datos de la imagen a la tarjeta
+		glTexImage2D(GL_TEXTURE_2D, 0, textureScreen01.getChannels() == 3 ? GL_RGB : GL_RGBA, textureScreen01.getWidth(), textureScreen01.getHeight(), 0,
+					 textureScreen01.getChannels() == 3 ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, textureScreen01.getData());
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+		std::cout << "Fallo la carga de textura" << std::endl;
+	textureScreen01.freeImage(); // Liberamos memoria
+	
+	// Definiendo la textura
+	Texture textureScreen02("../media/textures_screen/gameplay_02.PNG");
+	textureScreen02.loadImage();										  // Cargar la textura
+	glGenTextures(1, &txs_gameplay_ui_02);							  // Creando el id de la textura del landingpad
+	glBindTexture(GL_TEXTURE_2D, txs_gameplay_ui_02);				  // Se enlaza la textura
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	  // Wrapping en el eje u
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);	  // Wrapping en el eje v
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // Filtering de minimización
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // Filtering de maximimizacion
+	if (textureScreen02.getData())
+	{
+		// Transferir los datos de la imagen a la tarjeta
+		glTexImage2D(GL_TEXTURE_2D, 0, textureScreen02.getChannels() == 3 ? GL_RGB : GL_RGBA, textureScreen02.getWidth(), textureScreen02.getHeight(), 0,
+					 textureScreen02.getChannels() == 3 ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, textureScreen02.getData());
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+		std::cout << "Fallo la carga de textura" << std::endl;
+	textureScreen02.freeImage(); // Liberamos memoria
 
 	// ****************************************************************
 	// init(): TABLERO
@@ -1421,7 +1465,7 @@ void destroy()
 	glDeleteTextures(1, &txs_main_title01);
 	glDeleteTextures(1, &txs_main_title02);
 	glDeleteTextures(1, &txs_main_title03);
-	glDeleteTextures(1, &txs_gameplay_ui_personajes);
+	glDeleteTextures(1, &txs_gameplay_ui_01);
 	glDeleteTextures(1, &txs_gameplay_efecto_ataque);
 	glDeleteTextures(1, &txs_gameplay_efecto_defensa);
 	glDeleteTextures(1, &txs_gameplay_efecto_velocidad);
@@ -1505,7 +1549,8 @@ bool processInput(bool continueApplication)
 			if (ena_key_enter && glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS)
 			{
 				iniciaPartida = true;
-				txs_active = txs_gameplay_ui_personajes;
+				ena_key_enter = false;
+				txs_active = txs_gameplay_ui_01;
 				alSourcePlay(al_sources[1]);
 			}
 			else if (ena_key_left && glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
@@ -1558,6 +1603,59 @@ bool processInput(bool continueApplication)
 			ena_key_right = true;
 		}
 	}
+	// FIN DE: processInput(): TITLE SCREEM
+	// ****************************************************************
+
+	// ****************************************************************
+	// processInput(): GAME SCREEN
+	// ****************************************************************
+	else if (iniciaPartida)
+	{
+		if (txs_active == txs_gameplay_ui_01)
+		{
+			if (ena_key_enter && glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS)
+			{
+				txs_active = txs_gameplay_ui_00;
+				alSourcePlay(al_sources[1]);
+			}
+			else if (ena_key_down && glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+			{
+				ena_key_down = false;
+				txs_active = txs_gameplay_ui_02;
+				alSourcePlay(al_sources[1]);
+			}
+		}
+		else if (txs_active == txs_gameplay_ui_02)
+		{
+			if (ena_key_enter && glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS)
+			{
+				txs_active = txs_gameplay_ui_00;
+				alSourcePlay(al_sources[1]);
+			}
+			else if (ena_key_up && glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+			{
+				ena_key_down = false;
+				txs_active = txs_gameplay_ui_01;
+				alSourcePlay(al_sources[1]);
+			}
+		}
+
+		if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_RELEASE)
+		{
+			ena_key_enter = true;
+		}
+		if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_RELEASE)
+		{
+			ena_key_up = true;
+		}
+		if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_RELEASE)
+		{
+			ena_key_down = true;
+		}
+	}
+
+	// FIN DE: processInput(): GAME SCREEM
+	// ****************************************************************
 
 	// ****************************************************************
 	// processInput(): CÁMARAS
@@ -1735,7 +1833,7 @@ bool processInput(bool continueApplication)
 				}
 
 				//----------------------Movimientos-------------------------------------
-				ModelMatrixCazador=Movimiento(&Cazador,dado,ModelMatrixCazador);
+				ModelMatrixCazador = Movimiento(&Cazador, dado, ModelMatrixCazador);
 				//------------------------Fin Movimienots-----------------------------------------------
 
 				printf("Entro a accion 1 del cazador y su ataque es %d\n", Cazador.ataque);
@@ -1767,7 +1865,7 @@ bool processInput(bool continueApplication)
 					}
 
 					//----------------------Movimientos-------------------------------------
-					ModelMatrixCazador=Movimiento(&Cazador,dado,ModelMatrixCazador);
+					ModelMatrixCazador = Movimiento(&Cazador, dado, ModelMatrixCazador);
 					//------------------------Fin Movimienots-----------------------------------------------
 
 					printf("Entro a accion 2 del cazador y su ataque es %d\n", Cazador.ataque);
@@ -1814,7 +1912,7 @@ bool processInput(bool continueApplication)
 				}
 
 				//----------------------Movimientos-------------------------------------
-				ModelMatrixSanador=Movimiento(&Sanador,dado,ModelMatrixSanador);
+				ModelMatrixSanador = Movimiento(&Sanador, dado, ModelMatrixSanador);
 				//------------------------Fin Movimienots-----------------------------------------------
 
 				printf("Entro a accion 1 del sanador y su ataque es %d\n", Sanador.ataque);
@@ -1850,7 +1948,7 @@ bool processInput(bool continueApplication)
 						PerderBuffo(buffo, &Sanador);
 					}
 					//----------------------Movimientos-------------------------------------
-					ModelMatrixSanador=Movimiento(&Sanador,dado,ModelMatrixSanador);
+					ModelMatrixSanador = Movimiento(&Sanador, dado, ModelMatrixSanador);
 					//------------------------Fin Movimienots-----------------------------------------------
 					printf("Entro a accion 2 del sanador y su ataque es %d\n", Sanador.ataque);
 					printf("Entro a accion 2 del sanador y su defensa es %d\n", Sanador.defensa);
@@ -1867,6 +1965,7 @@ bool processInput(bool continueApplication)
 			SanadorSelected = false;
 		}
 	}
+	
 	if (modelSelected == 3 && enableTirada)
 	{
 		if (CaballeroSelected && Caballero.vida > 0)
@@ -1884,7 +1983,7 @@ bool processInput(bool continueApplication)
 					PerderBuffo(buffo, &Caballero);
 				}
 				//----------------------Movimientos-------------------------------------
-				ModelMatrixCaballero=Movimiento(&Caballero,dado,ModelMatrixCaballero);
+				ModelMatrixCaballero = Movimiento(&Caballero, dado, ModelMatrixCaballero);
 				//------------------------Fin Movimienots-----------------------------------------------
 				printf("Entro a accion 1 del caballero y su ataque es %d\n", Caballero.ataque);
 				printf("Entro a accion 1 del caballero y su defensa es %d\n", Caballero.defensa);
@@ -1904,7 +2003,7 @@ bool processInput(bool continueApplication)
 					PerderBuffo(buffo, &Caballero);
 				}
 				//----------------------Movimientos-------------------------------------
-				ModelMatrixCaballero=Movimiento(&Caballero,dado,ModelMatrixCaballero);
+				ModelMatrixCaballero = Movimiento(&Caballero, dado, ModelMatrixCaballero);
 				//------------------------Fin Movimienots-----------------------------------------------
 				Caballero.defensa = Caballero.defensa - 2;
 				printf("Entro a accion 2 del caballero y su ataque es %d\n", Caballero.ataque);
@@ -1934,7 +2033,7 @@ bool processInput(bool continueApplication)
 				PerderBuffo(buffo, &Vengador);
 			}
 			//----------------------Movimientos-------------------------------------
-			ModelMatrixVengador=Movimiento(&Vengador,dado,ModelMatrixVengador);
+			ModelMatrixVengador = Movimiento(&Vengador, dado, ModelMatrixVengador);
 			//------------------------Fin Movimienots-----------------------------------------------
 			printf("Entro a accion 1 del vengador y su ataque es %d\n", Vengador.ataque);
 			printf("Entro a accion 1 del vengador y su defensa es %d\n", Vengador.defensa);
@@ -1954,7 +2053,7 @@ bool processInput(bool continueApplication)
 				PerderBuffo(buffo, &Vengador);
 			}
 			//----------------------Movimientos-------------------------------------
-			ModelMatrixVengador=Movimiento(&Vengador,dado,ModelMatrixVengador);
+			ModelMatrixVengador = Movimiento(&Vengador, dado, ModelMatrixVengador);
 			//------------------------Fin Movimienots-----------------------------------------------
 			printf("Entro a accion 2 del vengador y su ataque es %d\n", Vengador.ataque);
 			printf("Entro a accion 2 del vengador y su defensa es %d\n", Vengador.defensa);
@@ -1966,19 +2065,21 @@ bool processInput(bool continueApplication)
 			Vengador = TiradaDeSalvacion(Vengador);
 			VengadorSelected = false;
 		}
-		printf("vida del jefe %d\n",Anfiteres.vida);
+		printf("vida del jefe %d\n", Anfiteres.vida);
 	}
+	
+	
 	//--------------------------------------------------------
 	// Cambiar tipo de camara
-	//if (enable_camera && glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS)
-//	{
-//		cameraState = "libre";
-//		enable_camera = false;
-//	}
-//	if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_K) == GLFW_RELEASE)
-//	{
-//		enable_camera = true;
-//	}
+	// if (enable_camera && glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS)
+	//	{
+	//		cameraState = "libre";
+	//		enable_camera = false;
+	//	}
+	//	if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_K) == GLFW_RELEASE)
+	//	{
+	//		enable_camera = true;
+	//	}
 	glfwPollEvents();
 	return continueApplication;
 }
@@ -2348,7 +2449,7 @@ void applicationLoop()
 		shaderMulLighting.setVectorFloat3("fogColor", glm::value_ptr(color_fog));
 		shaderTerrain.setVectorFloat3("fogColor", glm::value_ptr(color_fog));
 		shaderSkybox.setVectorFloat3("fogColor", glm::value_ptr(color_fog));
-		
+
 		shaderMulLighting.setFloat("density", 0.055);
 		shaderMulLighting.setFloat("gradient", 0.5);
 		shaderTerrain.setFloat("density", 0.055);
