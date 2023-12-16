@@ -253,20 +253,20 @@ int buffo = 0;
 struct Personaje
 {
 	// Valores base de cada persoanje
-	int TipoPj;			 // Tipo de Personaje
-	int ataque;			 // Ataque de Personaje
-	int defensa;		 // Defensa de Personaje
-	int vida;			 // Vida de Personaje (Se modifica constante mente despues de cada accion)
-	int vidaMx;			 // Vida MAX de Personje
-	int PossTablero;	 // Posicion de Personaje en el Tableor
-	int TiradaSalvacion; // Tirada de salvacion del personje
-	int CD;				 // Cooldown de Personaje (Se modifica constante mente despues de cada accion)
-	int CDMX;			 // Cooldown MAX de Personaje
-	int BanderaPos1;
-	int BanderaPos2;
-	int BanderaPos3;
-	int BanderaPos4;
-	int ControlAnimacion;
+	int TipoPj;			  // Tipo de Personaje
+	int ataque;			  // Ataque de Personaje
+	int defensa;		  // Defensa de Personaje
+	int vida;			  // Vida de Personaje (Se modifica constante mente despues de cada accion)
+	int vidaMx;			  // Vida MAX de Personje
+	int PossTablero;	  // Posicion de Personaje en el Tableor
+	int TiradaSalvacion;  // Tirada de salvacion del personje
+	int CD;				  // Cooldown de Personaje (Se modifica constante mente despues de cada accion)
+	int CDMX;			  // Cooldown MAX de Personaje
+	int BanderaPos1;	  // Banderas de Poicion para el tablero
+	int BanderaPos2;	  //.
+	int BanderaPos3;	  //.
+	int BanderaPos4;	  //.
+	int ControlAnimacion; // Controla las animaicones utilizadas Dependiendo de la casilla
 };
 
 // Función para inicializar un personaje basado en el tipo
@@ -361,7 +361,7 @@ struct Monstruo
 	int ataque;	 // Ataque de Monstruo
 	int defensa; // Defensa de Monstruo
 	int vida;
-	int vidaMx;	 // vida de Monstruo
+	int vidaMx; // vida de Monstruo
 };
 
 // Función para inicializar un monstruo basado en el tipo
@@ -421,7 +421,7 @@ struct Monstruo Anfiteres = inicializarMonstruo(3);
 // conbate
 void Combate(Personaje *Pj, Monstruo *Ms)
 {
-	
+
 	printf("Entraste al combate.\n");
 	// Dados
 	int dadoPj = 1 + rand() % 6;
@@ -2132,15 +2132,14 @@ bool processInput(bool continueApplication)
 
 				printf("Habilidad en CD Tira el Dado (Accion 1) CD %d / %d\n", Vengador.CD, Vengador.CDMX);
 			}
-			
 		}
 		if (VengadorSelected && Vengador.vida <= 0)
-			{
-				printf("TIRADA DE SALVACION");
-				Vengador = TiradaDeSalvacion(Vengador);
-				VengadorSelected = false;
-				modelSelected=1;
-			}
+		{
+			printf("TIRADA DE SALVACION");
+			Vengador = TiradaDeSalvacion(Vengador);
+			VengadorSelected = false;
+			modelSelected = 1;
+		}
 	}
 
 	glfwPollEvents();
@@ -2234,8 +2233,9 @@ void renderSolidScene()
 	ModelMatrixCazador[2] = glm::vec4(ejez, 0.0);
 	ModelMatrixCazador[3][1] = terrain.getHeightTerrain(ModelMatrixCazador[3][0], ModelMatrixCazador[3][2]);
 	ModelCazador.setAnimationIndex(Cazador.ControlAnimacion);
-	if(Cazador.vida>1){
-	ModelCazador.render(renderMatrixCazador);
+	if (Cazador.vida > 1)
+	{
+		ModelCazador.render(renderMatrixCazador);
 	}
 
 	glm::mat4 renderMatrixSanador = glm::mat4(ModelMatrixSanador);
@@ -2246,8 +2246,9 @@ void renderSolidScene()
 	ModelMatrixSanador[2] = glm::vec4(ejez, 0.0);
 	ModelMatrixSanador[3][1] = terrain.getHeightTerrain(ModelMatrixSanador[3][0], ModelMatrixSanador[3][2]);
 	ModelSanador.setAnimationIndex(Sanador.ControlAnimacion);
-	if(Sanador.vida>0){
-	ModelSanador.render(renderMatrixSanador);
+	if (Sanador.vida > 0)
+	{
+		ModelSanador.render(renderMatrixSanador);
 	}
 
 	glm::mat4 renderMatrixCaballero = glm::mat4(ModelMatrixCaballero);
@@ -2258,8 +2259,9 @@ void renderSolidScene()
 	ModelMatrixCaballero[2] = glm::vec4(ejez, 0.0);
 	ModelMatrixCaballero[3][1] = terrain.getHeightTerrain(ModelMatrixCaballero[3][0], ModelMatrixCaballero[3][2]);
 	ModelCaballero.setAnimationIndex(Caballero.ControlAnimacion);
-	if(Caballero.vida){
-	ModelCaballero.render(renderMatrixCaballero);
+	if (Caballero.vida)
+	{
+		ModelCaballero.render(renderMatrixCaballero);
 	}
 
 	glm::mat4 renderMatrixVengador = glm::mat4(ModelMatrixVengador);
@@ -2270,8 +2272,9 @@ void renderSolidScene()
 	ModelMatrixVengador[2] = glm::vec4(ejez, 0.0);
 	ModelMatrixVengador[3][1] = terrain.getHeightTerrain(ModelMatrixVengador[3][0], ModelMatrixVengador[3][2]);
 	ModelVengador.setAnimationIndex(Vengador.ControlAnimacion);
-	if(Vengador.vida>0){
-	ModelVengador.render(renderMatrixVengador);
+	if (Vengador.vida > 0)
+	{
+		ModelVengador.render(renderMatrixVengador);
 	}
 
 	glm::mat4 renderMatrixAnfiteres = glm::mat4(ModelMatrixAnfiteres);
@@ -2287,29 +2290,14 @@ void renderSolidScene()
 	glm::mat4 renderMatrixEsqueleto = glm::mat4(ModelMatrixEsqueleto);
 	renderMatrixEsqueleto = glm::scale(renderMatrixEsqueleto, glm::vec3(0.1f, 0.1f, 0.1f));
 	renderMatrixEsqueleto = glm::rotate(renderMatrixEsqueleto, glm::radians(90.0f), glm::vec3(-1.0f, 0.0f, 0.0f));
-	ejex = glm::normalize(glm::cross(ejey, ejez));
-	ModelMatrixEsqueleto[0] = glm::vec4(ejex, 0.0);
-	ModelMatrixEsqueleto[1] = glm::vec4(ejey, 0.0);
-	ModelMatrixEsqueleto[2] = glm::vec4(ejez, 0.0);
-	ModelMatrixEsqueleto[3][1] = terrain.getHeightTerrain(ModelMatrixEsqueleto[3][0], ModelMatrixEsqueleto[3][2]);
 	ModelEsqueleto.render(renderMatrixEsqueleto);
 
 	glm::mat4 renderMatrixDemonio = glm::mat4(ModelMatrixDemonio);
 	renderMatrixDemonio = glm::scale(renderMatrixDemonio, glm::vec3(0.2f, 0.2f, 0.2f));
-	ejex = glm::normalize(glm::cross(ejey, ejez));
-	ModelMatrixDemonio[0] = glm::vec4(ejex, 0.0);
-	ModelMatrixDemonio[1] = glm::vec4(ejey, 0.0);
-	ModelMatrixDemonio[2] = glm::vec4(ejez, 0.0);
-	ModelMatrixDemonio[3][1] = terrain.getHeightTerrain(ModelMatrixDemonio[3][0], ModelMatrixDemonio[3][2]);
 	ModelDemonio.render(renderMatrixDemonio);
 
 	glm::mat4 renderMatrixHechicero = glm::mat4(ModelMatrixHechicero);
 	renderMatrixHechicero = glm::scale(renderMatrixHechicero, glm::vec3(0.01f, 0.01f, 0.01f));
-	ejex = glm::normalize(glm::cross(ejey, ejez));
-	ModelMatrixHechicero[0] = glm::vec4(ejex, 0.0);
-	ModelMatrixHechicero[1] = glm::vec4(ejey, 0.0);
-	ModelMatrixHechicero[2] = glm::vec4(ejez, 0.0);
-	ModelMatrixHechicero[3][1] = terrain.getHeightTerrain(ModelMatrixHechicero[3][0], ModelMatrixHechicero[3][2]);
 	ModelHechicero.render(renderMatrixHechicero);
 
 	/*******************************************
@@ -2371,47 +2359,47 @@ void renderAlphaScene(bool render = true)
 
 		// std::cout << "cursor_x: " << cursor_x << std::endl;
 		// std::cout << "cursor_y: " << cursor_y << std::endl;
-		//cazador
+		// cazador
 		sprintf(CadenaAtqCazador, "%d=>PA", Cazador.ataque);
 		modelText->render(CadenaAtqCazador, -0.5460, 0.833);
 
-		sprintf(CadenaVidaCazador, "%d/%d=>PV", Cazador.vida,Cazador.vidaMx);
+		sprintf(CadenaVidaCazador, "%d/%d=>PV", Cazador.vida, Cazador.vidaMx);
 		modelText->render(CadenaVidaCazador, -0.5460, 0.773);
 
-		sprintf(CadenaCDCazador, "%d/%d=>CD", Cazador.CD,Cazador.CDMX);
+		sprintf(CadenaCDCazador, "%d/%d=>CD", Cazador.CD, Cazador.CDMX);
 		modelText->render(CadenaCDCazador, -0.5460, 0.713);
 
-		//sanador
+		// sanador
 		sprintf(CadenaAtqSanador, "%d=>PA", Sanador.ataque);
 		modelText->render(CadenaAtqSanador, -0.0540, 0.833);
 
-		sprintf(CadenaVidaSanador, "%d/%d=>PV", Sanador.vida,Sanador.vidaMx);
+		sprintf(CadenaVidaSanador, "%d/%d=>PV", Sanador.vida, Sanador.vidaMx);
 		modelText->render(CadenaVidaSanador, -0.0540, 0.773);
 
-		sprintf(CadenaCDSanador, "%d/%d=>CD", Sanador.CD,Sanador.CDMX);
+		sprintf(CadenaCDSanador, "%d/%d=>CD", Sanador.CD, Sanador.CDMX);
 		modelText->render(CadenaCDSanador, -0.0540, 0.713);
 
-		//Caballero
+		// Caballero
 		sprintf(CadenaAtqCaballero, "%d=>PA", Caballero.ataque);
 		modelText->render(CadenaAtqCaballero, 0.4229, 0.833);
 
-		sprintf(CadenaVidaCaballero, "%d/%d=>PV", Caballero.vida,Caballero.vidaMx);
+		sprintf(CadenaVidaCaballero, "%d/%d=>PV", Caballero.vida, Caballero.vidaMx);
 		modelText->render(CadenaVidaCaballero, 0.4229, 0.773);
 
-		sprintf(CadenaCDCaballero, "%d/%d=>CD", Caballero.CD,Caballero.CDMX);
+		sprintf(CadenaCDCaballero, "%d/%d=>CD", Caballero.CD, Caballero.CDMX);
 		modelText->render(CadenaCDCaballero, 0.4229, 0.713);
-		
-		//Vengador
+
+		// Vengador
 		sprintf(CadenaAtqVengador, "%d=>PA", Vengador.ataque);
 		modelText->render(CadenaAtqVengador, 0.8939, 0.833);
-		
-		sprintf(CadenaVidaVengador, "%d/%d=>PV", Vengador.vida,Vengador.vidaMx);
+
+		sprintf(CadenaVidaVengador, "%d/%d=>PV", Vengador.vida, Vengador.vidaMx);
 		modelText->render(CadenaVidaVengador, 0.8939, 0.773);
 
-		sprintf(CadenaCDVengador, "%d/%d=>CD", Vengador.CD,Vengador.CDMX);
+		sprintf(CadenaCDVengador, "%d/%d=>CD", Vengador.CD, Vengador.CDMX);
 		modelText->render(CadenaCDVengador, 0.8939, 0.713);
-		
-		//Anfiteres
+
+		// Anfiteres
 
 		modelText->render("Anfiteres", 0.8939, -0.603);
 		modelText->render("===================", 0.8939, -0.623);
@@ -2419,17 +2407,17 @@ void renderAlphaScene(bool render = true)
 		sprintf(CandenaAtqAnfiteres, "%d=>PA", Anfiteres.ataque);
 		modelText->render(CandenaAtqAnfiteres, 0.8939, -0.653);
 
-		sprintf(CandenaVidaAnfiteres, "%d/%d=PV", Anfiteres.vida,Anfiteres.vidaMx);
+		sprintf(CandenaVidaAnfiteres, "%d/%d=PV", Anfiteres.vida, Anfiteres.vidaMx);
 		modelText->render(CandenaVidaAnfiteres, 0.8939, -0.713);
 
-		//MS
+		// MS
 		modelText->render("Monstruos", 0.6939, -0.603);
 		modelText->render("===================", 0.6939, -0.623);
 
 		sprintf(CandenaAtqMs, "%d=>PA", GeneradorMs.ataque);
 		modelText->render(CandenaAtqMs, 0.6939, -0.653);
 
-		sprintf(CandenaVidaMs, "%d/%d=>PV", GeneradorMs.vida,GeneradorMs.vidaMx);
+		sprintf(CandenaVidaMs, "%d/%d=>PV", GeneradorMs.vida, GeneradorMs.vidaMx);
 		modelText->render(CandenaVidaMs, 0.6939, -0.713);
 
 		// cursor_x: -0.5460
@@ -2496,9 +2484,9 @@ void applicationLoop()
 
 	ModelMatrixAnfiteres = glm::translate(ModelMatrixAnfiteres, glm::vec3(0.0, 0.0, 0.0));
 
-	ModelMatrixEsqueleto = glm::translate(ModelMatrixEsqueleto, glm::vec3(15.0, 1.0, 18.0));
+	ModelMatrixEsqueleto = glm::translate(ModelMatrixEsqueleto, glm::vec3(15.0, 2.0, 18.0));
 
-	ModelMatrixDemonio = glm::translate(ModelMatrixDemonio, glm::vec3(-25.0, 2.0, 18.0));
+	ModelMatrixDemonio = glm::translate(ModelMatrixDemonio, glm::vec3(-25.0, 3.0, 18.0));
 
 	ModelMatrixHechicero = glm::translate(ModelMatrixHechicero, glm::vec3(-25.5, 2.0, -18.0));
 
@@ -2568,7 +2556,7 @@ void applicationLoop()
 			axis = glm::axis(glm::quat_cast(ModelMatrixVengador));
 		}
 		camera3P->setAngleTarget(angleTarget);
-		camera3P->setCameraTarget(target+glm::vec3(0.0,5.0,0.0));
+		camera3P->setCameraTarget(target + glm::vec3(0.0, 5.0, 0.0));
 		camera3P->updateCamera();
 		view = camera3P->getViewMatrix();
 
